@@ -31,6 +31,8 @@ producer -> Kafka topic -> consumer -> rules -> LangGraph -> Ollama -> streamed 
 
 Traceability from learning intent to code is maintained in [docs/traceability.md](docs/traceability.md). GitHub issue definitions and links for the main work topics are in [docs/github-issues.md](docs/github-issues.md). Runtime verification notes are in [docs/verification.md](docs/verification.md), and issue completion status is summarized in [docs/project-status.md](docs/project-status.md).
 
+License transparency is documented in [LICENSE](LICENSE), [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), and [docs/license-review.md](docs/license-review.md). The project code is MIT licensed.
+
 To create the GitHub issues from the local backlog after authenticating `gh`:
 
 ```bash
@@ -53,6 +55,8 @@ gh auth login
 Ollama runs the model on your machine. The consumer calls the local Ollama HTTP API at `http://localhost:11434/api/generate` and prints streamed text chunks as they arrive.
 
 No OpenAI, Anthropic, Gemini, hosted LangSmith, hosted vector database, cloud Kafka, or API key is used.
+
+Ollama models are not bundled with this repository. Check the license for any model you pull locally, such as `llama3.2` or `qwen3-coder:30b`, before redistributing model files or outputs in another project.
 
 ## Install Dependencies
 
