@@ -59,6 +59,8 @@ Use this path when you want to run the full example from a clean checkout on mac
 
 1. Create and install the Python environment:
 
+What you learn: Python project dependencies should be isolated in a disposable virtual environment, so this example does not depend on packages installed globally on your Mac. Official resource: [Python `venv` documentation](https://docs.python.org/3/library/venv.html).
+
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
@@ -67,7 +69,11 @@ pip install -e ".[dev]"
 
 2. Start your local container runner, such as Rancher Desktop, Docker Desktop, or Colima.
 
+What you learn: Kafka runs as a local container in this project, and Docker Compose is the small local orchestration layer that starts the broker. Official resource: [Docker Compose documentation](https://docs.docker.com/compose/).
+
 3. Start Kafka and create the topic:
+
+What you learn: Kafka stores events in named topics; `banking.transactions` is the stream that the producer writes to and the consumer reads from. Official resource: [Apache Kafka quickstart](https://kafka.apache.org/quickstart/).
 
 ```bash
 ./scripts/start.sh
@@ -76,6 +82,8 @@ PYTHON=.venv/bin/python ./scripts/create_topics.sh
 ```
 
 4. Make sure Ollama is running and choose a local model:
+
+What you learn: Ollama runs the LLM locally and exposes a local HTTP API, so the inspection explanation does not call an external AI service. Official resources: [Ollama API documentation](https://github.com/ollama/ollama/blob/main/docs/api.md) and [Ollama model library](https://ollama.com/library).
 
 ```bash
 ollama serve
@@ -96,17 +104,23 @@ export OLLAMA_MODEL=llama3.2
 
 5. Produce demo transactions:
 
+What you learn: a Kafka producer writes a JSON message value to a topic and uses `transaction_id` as the message key. Official resource: [Apache Kafka quickstart](https://kafka.apache.org/quickstart/).
+
 ```bash
 PYTHON=.venv/bin/python ./scripts/produce_demo_transactions.sh
 ```
 
 6. Consume and inspect transactions with streamed terminal output:
 
+What you learn: a Kafka consumer reads messages as part of a consumer group, the app applies deterministic rules first, LangGraph moves state through the inspection workflow, and Ollama streams explanation text back to the terminal. Official resources: [Apache Kafka quickstart](https://kafka.apache.org/quickstart/), [LangGraph overview](https://docs.langchain.com/oss/python/langgraph/overview), and [Ollama API documentation](https://github.com/ollama/ollama/blob/main/docs/api.md).
+
 ```bash
 PYTHON=.venv/bin/python MAX_MESSAGES=10 ./scripts/consume_and_inspect.sh
 ```
 
 7. Run the unit tests:
+
+What you learn: the rule logic, model validation, and graph state behavior can be verified without Kafka, containers, Ollama, or network access. Official resource: [pytest documentation](https://docs.pytest.org/en/stable/).
 
 ```bash
 .venv/bin/python -m pytest
@@ -116,13 +130,19 @@ PYTHON=.venv/bin/python MAX_MESSAGES=10 ./scripts/consume_and_inspect.sh
 
 Stop and remove the local Kafka container and Docker Compose network:
 
+What you learn: stopping the Compose stack removes this example's local Kafka runtime state because the project does not define a persistent Kafka volume. Official resource: [Docker Compose documentation](https://docs.docker.com/compose/).
+
 ```bash
 ./scripts/stop.sh
 ```
 
 Leave Ollama installed, but stop `ollama serve` with `Ctrl+C` in the terminal where it is running.
 
+What you learn: Ollama is a separate local runtime from Kafka; stopping Kafka does not stop the model server. Official resource: [Ollama documentation](https://github.com/ollama/ollama/tree/main/docs).
+
 Remove the Python virtual environment if you want a fully clean local checkout:
+
+What you learn: virtual environments are disposable and can be recreated from project metadata when needed. Official resource: [Python `venv` documentation](https://docs.python.org/3/library/venv.html).
 
 ```bash
 deactivate
@@ -130,6 +150,8 @@ rm -rf .venv
 ```
 
 Optional Docker image cleanup if you want to reclaim disk space:
+
+What you learn: containers are runtime instances, while images are cached templates; removing the image forces your container runner to download it again later. Official resource: [Docker image documentation](https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-an-image/).
 
 ```bash
 docker rmi apache/kafka:3.8.1
