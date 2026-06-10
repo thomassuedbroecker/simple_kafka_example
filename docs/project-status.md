@@ -35,6 +35,7 @@ Result:
 | [#9 Write README learning guide](https://github.com/thomassuedbroecker/simple_kafka_example/issues/9) | Closed | `README.md`, `docs/traceability.md`, `docs/verification.md` | `9365e24`, `2a88fc4`, `0fcb385`, `69e6b58`, `59176f0`, `6e662f0` |
 | [#10 Add infrastructure-free unit tests](https://github.com/thomassuedbroecker/simple_kafka_example/issues/10) | Closed | `tests/`, local `pytest` result | `9365e24`, `0fcb385` |
 | [#12 Add MIT license and open-source transparency docs](https://github.com/thomassuedbroecker/simple_kafka_example/issues/12) | Closed | `LICENSE`, `THIRD_PARTY_NOTICES.md`, `docs/license-review.md`, `pyproject.toml` | `d611a5c` |
+| [#13 Improve component license transparency](https://github.com/thomassuedbroecker/simple_kafka_example/issues/13) | Closed | `THIRD_PARTY_NOTICES.md`, `docs/license-review.md`, `docs/github-issues.md` | `b37d50b` |
 
 Issue [#11](https://github.com/thomassuedbroecker/simple_kafka_example/issues/11) is closed as a duplicate of #10.
 
