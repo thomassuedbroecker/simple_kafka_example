@@ -264,3 +264,24 @@ Acceptance criteria:
 - Unit tests still pass without Docker, Kafka, Ollama, or network access.
 
 Traceability: LI-003, LI-008, LI-009, LI-010.
+
+## GH-015: Reorder README around objective and expected results
+
+GitHub issue: https://github.com/thomassuedbroecker/simple_kafka_example/issues/15
+
+Labels: `documentation`
+
+Body:
+
+The README currently repeats setup sections and makes the objective harder to see. Reorder the topics so learners first see the objective, expected result, architecture, run flow, cleanup, learning concepts, and then reference material.
+
+Acceptance criteria:
+
+- README has an explicit objective near the top.
+- Expected terminal results are visible before reference material.
+- Duplicate install/start/produce/consume sections are consolidated or renamed as reference material.
+- Kafka and local AI concepts are kept, but placed after the runnable flow.
+- Verification, traceability, license, troubleshooting, and learning exercises remain linked.
+- Tests and markdown whitespace checks pass.
+
+Traceability: LI-009.

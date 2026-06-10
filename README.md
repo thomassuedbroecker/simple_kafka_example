@@ -4,146 +4,28 @@ This is a small local-first learning project for macOS on Apple Silicon. It show
 
 This project is for learning. It is not a production banking system, fraud engine, security reference architecture, or scalable Kafka deployment.
 
-## Why These Parts Exist
+## Objective
 
-- Kafka is used because it teaches event streaming: a producer writes events into a named topic, and a consumer reads those events later.
-- Ollama is used because it runs an LLM locally without API keys, cloud services, or external AI APIs.
-- LangGraph is used because it makes the inspection flow explicit as small state transitions.
-- Deterministic rules are used before the LLM because important decisions should not depend only on generated text.
-
-## Architecture
-
-```mermaid
-flowchart LR
-    A[Demo Transaction Producer] --> B[Kafka Topic: banking.transactions]
-    B --> C[Kafka Consumer]
-    C --> D[Deterministic Rules]
-    D --> E[LangGraph Agent]
-    E --> F[Ollama Local LLM]
-    F --> G[Streamed Terminal Explanation]
-```
-
-The runtime flow is:
+Run one complete local example and understand this flow:
 
 ```text
 producer -> Kafka topic -> consumer -> rules -> LangGraph -> Ollama -> streamed terminal output
 ```
 
-Traceability from learning intent to code is maintained in [docs/traceability.md](docs/traceability.md). GitHub issue definitions and links for the main work topics are in [docs/github-issues.md](docs/github-issues.md). Runtime verification notes are in [docs/verification.md](docs/verification.md), and issue completion status is summarized in [docs/project-status.md](docs/project-status.md).
+By the end, you should be able to explain:
 
-License transparency is documented in [LICENSE](LICENSE), [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), and [docs/license-review.md](docs/license-review.md). The project code is MIT licensed.
+- Kafka topic, producer, consumer, message key, message value, consumer group, offset, and JSON payload basics.
+- Why deterministic transaction rules run before the LLM explanation.
+- How LangGraph moves inspection state through small workflow nodes.
+- Where Ollama streams local AI output in the terminal.
+- Why this project does not need external AI APIs, cloud services, or API keys.
 
-To create the GitHub issues from the local backlog after authenticating `gh`:
+## Expected Result
 
-```bash
-gh auth login
-./scripts/create_github_issues.sh
-```
-
-## Learning Objective Traceability
-
-Use [docs/traceability.md](docs/traceability.md) to trace each learning objective to implementation files, tests, verification commands, and GitHub issues.
-
-| Learning objective | Trace |
-| --- | --- |
-| Kafka topic, producer, consumer, message key, message value, consumer group, offsets, and JSON payloads | [LI-001 to LI-003](docs/traceability.md#traceability-matrix) |
-| Deterministic banking transaction inspection rules | [LI-004](docs/traceability.md#traceability-matrix) |
-| Typed models for transaction, findings, inspection result, and graph state | [LI-005](docs/traceability.md#traceability-matrix) |
-| LangGraph state flow | [LI-006](docs/traceability.md#traceability-matrix) |
-| Local Ollama streaming without external AI APIs | [LI-007](docs/traceability.md#traceability-matrix) |
-| Local macOS/Rancher Desktop run scripts and infrastructure-free tests | [LI-008 to LI-010](docs/traceability.md#traceability-matrix) |
-
-## Quick Start
-
-Use this path when you want to run the full example from a clean checkout on macOS.
-
-1. Create and install the Python environment:
-
-What you learn: Python project dependencies should be isolated in a disposable virtual environment, so this example does not depend on packages installed globally on your Mac. Official resource: [Python `venv` documentation](https://docs.python.org/3/library/venv.html).
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -e ".[dev]"
-```
-
-2. Start your local container runner, such as Rancher Desktop, Docker Desktop, or Colima.
-
-What you learn: Kafka runs as a local container in this project, and Docker Compose is the small local orchestration layer that starts the broker. Official resource: [Docker Compose documentation](https://docs.docker.com/compose/).
-
-3. Start Kafka and create the topic:
-
-What you learn: Kafka stores events in named topics; `banking.transactions` is the stream that the producer writes to and the consumer reads from. Official resource: [Apache Kafka quickstart](https://kafka.apache.org/quickstart/).
-
-```bash
-./scripts/start.sh
-sleep 10
-PYTHON=.venv/bin/python ./scripts/create_topics.sh
-```
-
-Expected result:
+After setup, the important successful output is:
 
 ```text
-Container local-kafka-langgraph-banking-ai-kafka Running
-Created topic: banking.transactions
-```
-
-If the topic already exists, this is also OK:
-
-```text
-Topic already exists: banking.transactions
-```
-
-4. Make sure Ollama is running and choose a local model:
-
-What you learn: Ollama runs the LLM locally and exposes a local HTTP API, so the inspection explanation does not call an external AI service. Official resources: [Ollama API documentation](https://github.com/ollama/ollama/blob/main/docs/api.md) and [Ollama model library](https://ollama.com/library).
-
-```bash
-ollama serve
-```
-
-In another terminal:
-
-```bash
-export OLLAMA_MODEL=qwen3-coder:30b
-```
-
-If you want to use the default model instead:
-
-```bash
-ollama pull llama3.2
-export OLLAMA_MODEL=llama3.2
-```
-
-5. Produce demo transactions:
-
-What you learn: a Kafka producer writes a JSON message value to a topic and uses `transaction_id` as the message key. Official resource: [Apache Kafka quickstart](https://kafka.apache.org/quickstart/).
-
-```bash
-PYTHON=.venv/bin/python ./scripts/produce_demo_transactions.sh
-```
-
-Expected result:
-
-```text
-Queued transaction txn-1001: {...}
-...
-Sent key=txn-1010 topic=banking.transactions partition=0 offset=9
 Produced 10 demo transactions.
-```
-
-6. Consume and inspect transactions with streamed terminal output:
-
-What you learn: a Kafka consumer reads messages as part of a consumer group, the app applies deterministic rules first, LangGraph moves state through the inspection workflow, and Ollama streams explanation text back to the terminal. Official resources: [Apache Kafka quickstart](https://kafka.apache.org/quickstart/), [LangGraph overview](https://docs.langchain.com/oss/python/langgraph/overview), and [Ollama API documentation](https://github.com/ollama/ollama/blob/main/docs/api.md).
-
-```bash
-PYTHON=.venv/bin/python MAX_MESSAGES=10 ./scripts/consume_and_inspect.sh
-```
-
-Expected result:
-
-```text
-Consuming from topic 'banking.transactions' with group 'banking-ai-inspector'.
 
 Received transaction: txn-1001
 
@@ -155,10 +37,9 @@ This transaction looks normal because ...
 
 Final result:
 NORMAL
-Reviewer check: No deterministic rule was triggered; spot-check normal account context if needed.
 ```
 
-For suspicious examples, expect output like:
+Suspicious transactions should show triggered rules before the AI explanation:
 
 ```text
 Received transaction: txn-1010
@@ -173,92 +54,43 @@ This transaction should be reviewed because ...
 
 Final result:
 SUSPICIOUS
-Reviewer check: Review the triggered rule fields and compare the transaction with normal customer behavior.
 ```
 
-If you forgot to produce transactions first, the script now stops after the demo idle timeout and prints:
+## Architecture
 
-```text
-No Kafka messages arrived within 30 seconds.
-Run the producer first with: PYTHON=.venv/bin/python ./scripts/produce_demo_transactions.sh
-If you already consumed these messages, use a new CONSUMER_GROUP_ID to replay them.
+```mermaid
+flowchart LR
+    A[Demo Transaction Producer] --> B[Kafka Topic: banking.transactions]
+    B --> C[Kafka Consumer]
+    C --> D[Deterministic Rules]
+    D --> E[LangGraph Agent]
+    E --> F[Ollama Local LLM]
+    F --> G[Streamed Terminal Explanation]
 ```
 
-7. Run the unit tests:
+## Run The Example
 
-What you learn: the rule logic, model validation, and graph state behavior can be verified without Kafka, containers, Ollama, or network access. Official resource: [pytest documentation](https://docs.pytest.org/en/stable/).
+Use this order from a clean checkout. If you run the consumer before producing transactions, there is nothing to inspect.
+
+### 1. Install Dependencies
+
+What you learn: Python project dependencies should be isolated in a disposable virtual environment. Official resource: [Python `venv` documentation](https://docs.python.org/3/library/venv.html).
 
 ```bash
-.venv/bin/python -m pytest
-```
-
-## Clean Up
-
-Stop and remove the local Kafka container and Docker Compose network:
-
-What you learn: stopping the Compose stack removes this example's local Kafka runtime state because the project does not define a persistent Kafka volume. Official resource: [Docker Compose documentation](https://docs.docker.com/compose/).
-
-```bash
-./scripts/stop.sh
-```
-
-Leave Ollama installed, but stop `ollama serve` with `Ctrl+C` in the terminal where it is running.
-
-What you learn: Ollama is a separate local runtime from Kafka; stopping Kafka does not stop the model server. Official resource: [Ollama documentation](https://github.com/ollama/ollama/tree/main/docs).
-
-Remove the Python virtual environment if you want a fully clean local checkout:
-
-What you learn: virtual environments are disposable and can be recreated from project metadata when needed. Official resource: [Python `venv` documentation](https://docs.python.org/3/library/venv.html).
-
-```bash
-deactivate
-rm -rf .venv
-```
-
-Optional Docker image cleanup if you want to reclaim disk space:
-
-What you learn: containers are runtime instances, while images are cached templates; removing the image forces your container runner to download it again later. Official resource: [Docker image documentation](https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-an-image/).
-
-```bash
-docker rmi apache/kafka:3.8.1
-```
-
-This project does not define a persistent Kafka volume, so `./scripts/stop.sh` removes the Kafka container state for this example.
-
-## Kafka Basics In This Project
-
-- Topic: `banking.transactions` is the named stream of transaction events.
-- Producer: `python -m banking_ai.producer` writes JSON transaction events into Kafka.
-- Message key: the producer uses `transaction_id` as the Kafka key so related messages can be identified consistently.
-- Message value: the transaction payload is serialized as JSON.
-- Consumer: `python -m banking_ai.consumer` reads events from the topic.
-- Consumer group: `banking-ai-inspector` lets Kafka coordinate which consumer instance reads which messages.
-- Offset: Kafka tracks each consumer group's position in the topic. This example commits an offset only after a transaction was inspected successfully.
-
-## Local AI Basics
-
-Ollama runs the model on your machine. The consumer calls the local Ollama HTTP API at `http://localhost:11434/api/generate` and prints streamed text chunks as they arrive.
-
-No OpenAI, Anthropic, Gemini, hosted LangSmith, hosted vector database, cloud Kafka, or API key is used.
-
-Ollama models are not bundled with this repository. Check the license for any model you pull locally, such as `llama3.2` or `qwen3-coder:30b`, before redistributing model files or outputs in another project.
-
-## Install Dependencies
-
-Use Python 3.12 or newer.
-
-```bash
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
-## Start Kafka
+### 2. Start Kafka
 
-Start a local container runner such as Docker Desktop, Rancher Desktop, or Colima first.
+Start your local container runner first, such as Rancher Desktop, Docker Desktop, or Colima.
+
+What you learn: Kafka runs as a local container in this project, and Docker Compose starts the broker. Official resources: [Docker Compose documentation](https://docs.docker.com/compose/) and [Apache Kafka quickstart](https://kafka.apache.org/quickstart/).
 
 ```bash
 ./scripts/start.sh
+sleep 10
 PYTHON=.venv/bin/python ./scripts/create_topics.sh
 ```
 
@@ -276,11 +108,11 @@ Topic already exists: banking.transactions
 
 The Kafka broker runs in KRaft mode, which means there is no ZooKeeper container.
 
-The Python helper scripts use `${PYTHON:-python3}`. If your virtual environment is not activated, prefix them with `PYTHON=.venv/bin/python` as shown above.
-
-## Start Ollama
+### 3. Start Ollama
 
 Install Ollama from https://ollama.com if it is not installed yet.
+
+What you learn: Ollama runs the LLM locally and exposes a local HTTP API, so the inspection explanation does not call an external AI service. Official resources: [Ollama API documentation](https://github.com/ollama/ollama/blob/main/docs/api.md) and [Ollama model library](https://ollama.com/library).
 
 In one terminal:
 
@@ -288,25 +120,22 @@ In one terminal:
 ollama serve
 ```
 
-In another terminal:
+In another terminal, choose a local model. The default model is `llama3.2`:
 
 ```bash
 ollama pull llama3.2
-```
-
-You can choose a different local model with:
-
-```bash
 export OLLAMA_MODEL=llama3.2
 ```
 
-For example, the Rancher Desktop verification in this repository used an installed qwen 30B model:
+The local Rancher Desktop verification also worked with this installed qwen 30B model:
 
 ```bash
 export OLLAMA_MODEL=qwen3-coder:30b
 ```
 
-## Produce Demo Transactions
+### 4. Produce Demo Transactions
+
+What you learn: a Kafka producer writes a JSON message value to a topic and uses `transaction_id` as the message key.
 
 ```bash
 PYTHON=.venv/bin/python ./scripts/produce_demo_transactions.sh
@@ -317,48 +146,121 @@ Expected result:
 ```text
 Queued transaction txn-1001: {...}
 ...
+Sent key=txn-1010 topic=banking.transactions partition=0 offset=9
 Produced 10 demo transactions.
 ```
 
-or, with an activated virtual environment:
+### 5. Consume And Inspect Transactions
 
-```bash
-python -m banking_ai.producer
-```
-
-The producer sends at least 10 predefined fake transactions. Some are normal and some are suspicious.
-
-## Consume And Inspect Transactions
+What you learn: a Kafka consumer reads messages as part of a consumer group, the app applies deterministic rules first, LangGraph moves state through the inspection workflow, and Ollama streams explanation text back to the terminal. Official resource: [LangGraph overview](https://docs.langchain.com/oss/python/langgraph/overview).
 
 ```bash
 PYTHON=.venv/bin/python MAX_MESSAGES=10 ./scripts/consume_and_inspect.sh
 ```
 
-Important: run the producer once before running the consumer. After `./scripts/stop.sh`, Kafka's local container state is removed, so the topic is empty until you produce transactions again.
-
-or, with an activated virtual environment:
-
-```bash
-python -m banking_ai.consumer --max-messages 10
-```
-
-Example output shape:
+Expected normal transaction output:
 
 ```text
-Received transaction: txn-1004
+Consuming from topic 'banking.transactions' with group 'banking-ai-inspector'.
+
+Received transaction: txn-1001
+
+Rule findings:
+- none
+
+AI inspection:
+This transaction looks normal because ...
+
+Final result:
+NORMAL
+Reviewer check: No deterministic rule was triggered; spot-check normal account context if needed.
+```
+
+Expected suspicious transaction output:
+
+```text
+Received transaction: txn-1010
 
 Rule findings:
 - amount_greater_than_1000
 - foreign_country
+- suspicious_merchant_keyword
 
 AI inspection:
 This transaction should be reviewed because ...
 
 Final result:
 SUSPICIOUS
+Reviewer check: Review the triggered rule fields and compare the transaction with normal customer behavior.
 ```
 
-## Offsets And Consumer Groups
+If no messages arrive, the script stops after the demo idle timeout:
+
+```text
+No Kafka messages arrived within 30 seconds.
+Run the producer first with: PYTHON=.venv/bin/python ./scripts/produce_demo_transactions.sh
+If you already consumed these messages, use a new CONSUMER_GROUP_ID to replay them.
+```
+
+### 6. Run Tests
+
+What you learn: the rule logic, model validation, Kafka config, and graph state behavior can be verified without Kafka, containers, Ollama, or network access. Official resource: [pytest documentation](https://docs.pytest.org/en/stable/).
+
+```bash
+.venv/bin/python -m pytest
+```
+
+Expected result:
+
+```text
+10 passed
+```
+
+## Clean Up
+
+Stop and remove the local Kafka container and Docker Compose network:
+
+```bash
+./scripts/stop.sh
+```
+
+Stop `ollama serve` with `Ctrl+C` in the terminal where it is running.
+
+Remove the Python virtual environment if you want a fully clean local checkout:
+
+```bash
+deactivate
+rm -rf .venv
+```
+
+Optional Docker image cleanup if you want to reclaim disk space:
+
+```bash
+docker rmi apache/kafka:3.8.1
+```
+
+This project does not define a persistent Kafka volume. After `./scripts/stop.sh`, the topic is empty until you start Kafka and produce transactions again.
+
+## Learning Concepts
+
+### Why These Parts Exist
+
+- Kafka teaches event streaming: a producer writes events into a named topic, and a consumer reads those events later.
+- Ollama runs an LLM locally without API keys, cloud services, or external AI APIs.
+- LangGraph makes the inspection flow explicit as small state transitions.
+- Deterministic rules run before the LLM because important decisions should not depend only on generated text.
+
+### Kafka Basics In This Project
+
+- Topic: `banking.transactions` is the named stream of transaction events.
+- Producer: `python -m banking_ai.producer` writes JSON transaction events into Kafka.
+- Message key: the producer uses `transaction_id` as the Kafka key so related messages can be identified consistently.
+- Message value: the transaction payload is serialized as JSON.
+- Consumer: `python -m banking_ai.consumer` reads events from the topic.
+- Consumer group: `banking-ai-inspector` lets Kafka coordinate which consumer instance reads which messages.
+- Offset: Kafka tracks each consumer group's position in the topic. This example commits an offset only after a transaction was inspected successfully.
+
+### Offsets And Consumer Groups
 
 The consumer uses the group id `banking-ai-inspector`. Kafka stores the group's offset, which is the position of the next message the group should read.
 
@@ -368,8 +270,16 @@ If you run the same consumer group again after all messages were committed, it m
 
 ```bash
 export CONSUMER_GROUP_ID=banking-ai-inspector-run-2
-python -m banking_ai.consumer --max-messages 10
+python -m banking_ai.consumer --max-messages 10 --idle-timeout-seconds 30
 ```
+
+### Local AI Basics
+
+Ollama runs the model on your machine. The consumer calls the local Ollama HTTP API at `http://localhost:11434/api/generate` and prints streamed text chunks as they arrive.
+
+No OpenAI, Anthropic, Gemini, hosted LangSmith, hosted vector database, cloud Kafka, or API key is used.
+
+Ollama models are not bundled with this repository. Check the license for any model you pull locally, such as `llama3.2` or `qwen3-coder:30b`, before redistributing model files or outputs in another project.
 
 ## Configuration
 
@@ -386,19 +296,13 @@ CONSUMER_GROUP_ID=banking-ai-inspector
 
 Copy `.env.example` if you want a local reference file. The Python code reads environment variables directly.
 
-## Run Tests
+The Python helper scripts use `${PYTHON:-python3}`. If your virtual environment is not activated, prefix them with `PYTHON=.venv/bin/python`.
 
-The unit tests do not require Docker, Kafka, Ollama, or network access.
+## Documentation And Traceability
 
-```bash
-pytest
-```
+Traceability from learning intent to code is maintained in [docs/traceability.md](docs/traceability.md). GitHub issue definitions and links for the main work topics are in [docs/github-issues.md](docs/github-issues.md). Runtime verification notes are in [docs/verification.md](docs/verification.md), and issue completion status is summarized in [docs/project-status.md](docs/project-status.md).
 
-## Stop Kafka
-
-```bash
-./scripts/stop.sh
-```
+License transparency is documented in [LICENSE](LICENSE), [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), and [docs/license-review.md](docs/license-review.md). The project code is MIT licensed.
 
 ## Troubleshooting
 
@@ -435,14 +339,6 @@ Python cannot import `banking_ai`:
 ```bash
 source .venv/bin/activate
 pip install -e ".[dev]"
-```
-
-If you do not activate the virtual environment, run the project scripts with:
-
-```bash
-PYTHON=.venv/bin/python ./scripts/create_topics.sh
-PYTHON=.venv/bin/python ./scripts/produce_demo_transactions.sh
-PYTHON=.venv/bin/python MAX_MESSAGES=10 ./scripts/consume_and_inspect.sh
 ```
 
 ## Learning Exercises
