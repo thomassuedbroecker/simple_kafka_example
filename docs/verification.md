@@ -15,7 +15,7 @@ Python unit tests:
 Result:
 
 ```text
-8 passed
+9 passed
 ```
 
 Kafka startup with Rancher Desktop:

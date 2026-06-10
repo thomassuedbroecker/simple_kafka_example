@@ -203,3 +203,24 @@ Acceptance criteria:
 - `pytest` passes after installing development dependencies.
 
 Traceability: LI-004, LI-005, LI-006, LI-010.
+
+## GH-012: Add MIT license and open-source transparency docs
+
+GitHub issue: https://github.com/thomassuedbroecker/simple_kafka_example/issues/12
+
+Labels: `documentation`
+
+Body:
+
+Add repository-level license and open-source transparency documentation so users understand the project license and third-party dependency/model boundaries.
+
+Acceptance criteria:
+
+- Repository includes an MIT `LICENSE`.
+- Python package metadata references the license.
+- README links to license and third-party notices.
+- Third-party dependencies and local Ollama model licensing boundaries are documented.
+
+Traceability: repository governance and open-source transparency.
+
+Issue [#11](https://github.com/thomassuedbroecker/simple_kafka_example/issues/11) was created as a duplicate of GH-010 and is closed as duplicate.

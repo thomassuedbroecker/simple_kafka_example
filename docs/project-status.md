@@ -32,8 +32,9 @@ Result:
 | [#6 Build LangGraph inspection workflow](https://github.com/thomassuedbroecker/simple_kafka_example/issues/6) | Closed | `src/banking_ai/graph.py`, `tests/test_graph_state.py` | `9365e24`, `0fcb385` |
 | [#7 Add local Ollama streaming client](https://github.com/thomassuedbroecker/simple_kafka_example/issues/7) | Closed | `src/banking_ai/ollama_client.py`, qwen 30B smoke verification | `9365e24`, `2a88fc4`, `0fcb385` |
 | [#8 Add beginner-friendly scripts](https://github.com/thomassuedbroecker/simple_kafka_example/issues/8) | Closed | `scripts/`, `PYTHON=.venv/bin/python` support | `9365e24`, `2a88fc4` |
-| [#9 Write README learning guide](https://github.com/thomassuedbroecker/simple_kafka_example/issues/9) | Closed | `README.md`, `docs/traceability.md`, `docs/verification.md` | `9365e24`, `2a88fc4`, `0fcb385` |
+| [#9 Write README learning guide](https://github.com/thomassuedbroecker/simple_kafka_example/issues/9) | Closed | `README.md`, `docs/traceability.md`, `docs/verification.md` | `9365e24`, `2a88fc4`, `0fcb385`, `69e6b58`, `59176f0`, `6e662f0` |
 | [#10 Add infrastructure-free unit tests](https://github.com/thomassuedbroecker/simple_kafka_example/issues/10) | Closed | `tests/`, local `pytest` result | `9365e24`, `0fcb385` |
+| [#12 Add MIT license and open-source transparency docs](https://github.com/thomassuedbroecker/simple_kafka_example/issues/12) | Closed | `LICENSE`, `THIRD_PARTY_NOTICES.md`, `docs/license-review.md`, `pyproject.toml` | `d611a5c` |
 
 Issue [#11](https://github.com/thomassuedbroecker/simple_kafka_example/issues/11) is closed as a duplicate of #10.
 
