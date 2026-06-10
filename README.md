@@ -81,6 +81,19 @@ sleep 10
 PYTHON=.venv/bin/python ./scripts/create_topics.sh
 ```
 
+Expected result:
+
+```text
+Container local-kafka-langgraph-banking-ai-kafka Running
+Created topic: banking.transactions
+```
+
+If the topic already exists, this is also OK:
+
+```text
+Topic already exists: banking.transactions
+```
+
 4. Make sure Ollama is running and choose a local model:
 
 What you learn: Ollama runs the LLM locally and exposes a local HTTP API, so the inspection explanation does not call an external AI service. Official resources: [Ollama API documentation](https://github.com/ollama/ollama/blob/main/docs/api.md) and [Ollama model library](https://ollama.com/library).
@@ -110,12 +123,65 @@ What you learn: a Kafka producer writes a JSON message value to a topic and uses
 PYTHON=.venv/bin/python ./scripts/produce_demo_transactions.sh
 ```
 
+Expected result:
+
+```text
+Queued transaction txn-1001: {...}
+...
+Sent key=txn-1010 topic=banking.transactions partition=0 offset=9
+Produced 10 demo transactions.
+```
+
 6. Consume and inspect transactions with streamed terminal output:
 
 What you learn: a Kafka consumer reads messages as part of a consumer group, the app applies deterministic rules first, LangGraph moves state through the inspection workflow, and Ollama streams explanation text back to the terminal. Official resources: [Apache Kafka quickstart](https://kafka.apache.org/quickstart/), [LangGraph overview](https://docs.langchain.com/oss/python/langgraph/overview), and [Ollama API documentation](https://github.com/ollama/ollama/blob/main/docs/api.md).
 
 ```bash
 PYTHON=.venv/bin/python MAX_MESSAGES=10 ./scripts/consume_and_inspect.sh
+```
+
+Expected result:
+
+```text
+Consuming from topic 'banking.transactions' with group 'banking-ai-inspector'.
+
+Received transaction: txn-1001
+
+Rule findings:
+- none
+
+AI inspection:
+This transaction looks normal because ...
+
+Final result:
+NORMAL
+Reviewer check: No deterministic rule was triggered; spot-check normal account context if needed.
+```
+
+For suspicious examples, expect output like:
+
+```text
+Received transaction: txn-1010
+
+Rule findings:
+- amount_greater_than_1000
+- foreign_country
+- suspicious_merchant_keyword
+
+AI inspection:
+This transaction should be reviewed because ...
+
+Final result:
+SUSPICIOUS
+Reviewer check: Review the triggered rule fields and compare the transaction with normal customer behavior.
+```
+
+If you forgot to produce transactions first, the script now stops after the demo idle timeout and prints:
+
+```text
+No Kafka messages arrived within 30 seconds.
+Run the producer first with: PYTHON=.venv/bin/python ./scripts/produce_demo_transactions.sh
+If you already consumed these messages, use a new CONSUMER_GROUP_ID to replay them.
 ```
 
 7. Run the unit tests:
@@ -196,6 +262,18 @@ Start a local container runner such as Docker Desktop, Rancher Desktop, or Colim
 PYTHON=.venv/bin/python ./scripts/create_topics.sh
 ```
 
+Expected result:
+
+```text
+Created topic: banking.transactions
+```
+
+or:
+
+```text
+Topic already exists: banking.transactions
+```
+
 The Kafka broker runs in KRaft mode, which means there is no ZooKeeper container.
 
 The Python helper scripts use `${PYTHON:-python3}`. If your virtual environment is not activated, prefix them with `PYTHON=.venv/bin/python` as shown above.
@@ -234,6 +312,14 @@ export OLLAMA_MODEL=qwen3-coder:30b
 PYTHON=.venv/bin/python ./scripts/produce_demo_transactions.sh
 ```
 
+Expected result:
+
+```text
+Queued transaction txn-1001: {...}
+...
+Produced 10 demo transactions.
+```
+
 or, with an activated virtual environment:
 
 ```bash
@@ -247,6 +333,8 @@ The producer sends at least 10 predefined fake transactions. Some are normal and
 ```bash
 PYTHON=.venv/bin/python MAX_MESSAGES=10 ./scripts/consume_and_inspect.sh
 ```
+
+Important: run the producer once before running the consumer. After `./scripts/stop.sh`, Kafka's local container state is removed, so the topic is empty until you produce transactions again.
 
 or, with an activated virtual environment:
 
@@ -337,6 +425,7 @@ ollama pull llama3.2
 
 Consumer reads no messages:
 
+- Make sure you ran `PYTHON=.venv/bin/python ./scripts/produce_demo_transactions.sh` after the most recent `./scripts/start.sh`.
 - The messages may already be committed for the current consumer group.
 - Try a new group id with `export CONSUMER_GROUP_ID=banking-ai-inspector-run-2`.
 - Produce demo transactions again.

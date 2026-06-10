@@ -4,7 +4,7 @@ import json
 
 from confluent_kafka import Producer
 
-from banking_ai.config import load_settings
+from banking_ai.config import kafka_base_config, load_settings
 from banking_ai.models import BankingTransaction
 
 
@@ -127,7 +127,7 @@ def delivery_report(error, message) -> None:
 
 def main() -> None:
     settings = load_settings()
-    producer = Producer({"bootstrap.servers": settings.kafka_bootstrap_servers})
+    producer = Producer(kafka_base_config(settings))
 
     for item in DEMO_TRANSACTIONS:
         transaction = BankingTransaction.model_validate(item)

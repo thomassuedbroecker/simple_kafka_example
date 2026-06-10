@@ -2,12 +2,12 @@
 
 from confluent_kafka.admin import AdminClient, NewTopic
 
-from banking_ai.config import load_settings
+from banking_ai.config import kafka_base_config, load_settings
 
 
 def create_topics() -> None:
     settings = load_settings()
-    admin = AdminClient({"bootstrap.servers": settings.kafka_bootstrap_servers})
+    admin = AdminClient(kafka_base_config(settings))
     topic = NewTopic(settings.transaction_topic, num_partitions=1, replication_factor=1)
     futures = admin.create_topics([topic])
 

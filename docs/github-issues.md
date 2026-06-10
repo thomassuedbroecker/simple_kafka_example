@@ -244,3 +244,23 @@ Acceptance criteria:
 - Link the license review to the component inventory.
 
 Traceability: open-source transparency and license due-diligence documentation.
+
+## GH-014: Make demo run fail clearly when Kafka has no messages
+
+GitHub issue: https://github.com/thomassuedbroecker/simple_kafka_example/issues/14
+
+Labels: `developer-experience`
+
+Body:
+
+The README flow can look broken when a learner runs the consumer before producing transactions, or immediately after cleanup recreated Kafka with an empty topic. The consumer waits for messages and librdkafka can also print confusing localhost IPv6 connection-refused startup logs on macOS.
+
+Acceptance criteria:
+
+- Kafka clients prefer IPv4 localhost behavior to reduce macOS `::1` connection-refused noise.
+- The consume script has a bounded idle timeout for demos.
+- When no messages arrive, the consumer prints a clear hint to run the producer first or use a new consumer group for replay.
+- README troubleshooting explains the correct order after cleanup: start Kafka, create topic, produce transactions, then consume.
+- Unit tests still pass without Docker, Kafka, Ollama, or network access.
+
+Traceability: LI-003, LI-008, LI-009, LI-010.

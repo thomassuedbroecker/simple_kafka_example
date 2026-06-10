@@ -3,11 +3,12 @@
 import argparse
 import json
 import sys
+import time
 
 from confluent_kafka import Consumer, KafkaException
 from pydantic import ValidationError
 
-from banking_ai.config import load_settings
+from banking_ai.config import kafka_base_config, load_settings
 from banking_ai.graph import inspect_with_graph
 from banking_ai.models import BankingTransaction
 from banking_ai.ollama_client import OllamaClient, OllamaError
@@ -34,6 +35,15 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Stop after this many successfully inspected messages.",
     )
+    parser.add_argument(
+        "--idle-timeout-seconds",
+        type=float,
+        default=None,
+        help=(
+            "Stop if no Kafka messages arrive for this many seconds. "
+            "Useful for demos where transactions may not have been produced yet."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -41,16 +51,18 @@ def main() -> None:
     args = parse_args()
     settings = load_settings()
 
-    consumer = Consumer(
+    consumer_config = kafka_base_config(settings)
+    consumer_config.update(
         {
-            "bootstrap.servers": settings.kafka_bootstrap_servers,
             "group.id": settings.consumer_group_id,
             "auto.offset.reset": "earliest",
             "enable.auto.commit": False,
         }
     )
+    consumer = Consumer(consumer_config)
     ollama_client = OllamaClient(settings.ollama_base_url, settings.ollama_model)
     inspected_count = 0
+    idle_started_at = time.monotonic()
 
     consumer.subscribe([settings.transaction_topic])
     print(
@@ -62,9 +74,27 @@ def main() -> None:
         while args.max_messages is None or inspected_count < args.max_messages:
             message = consumer.poll(1.0)
             if message is None:
+                if (
+                    args.idle_timeout_seconds is not None
+                    and time.monotonic() - idle_started_at >= args.idle_timeout_seconds
+                ):
+                    print(
+                        "\nNo Kafka messages arrived within "
+                        f"{args.idle_timeout_seconds:g} seconds."
+                    )
+                    print(
+                        "Run the producer first with: "
+                        "PYTHON=.venv/bin/python ./scripts/produce_demo_transactions.sh"
+                    )
+                    print(
+                        "If you already consumed these messages, use a new "
+                        "CONSUMER_GROUP_ID to replay them."
+                    )
+                    break
                 continue
             if message.error():
                 raise KafkaException(message.error())
+            idle_started_at = time.monotonic()
 
             try:
                 payload = json.loads(message.value().decode("utf-8"))

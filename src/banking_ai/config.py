@@ -29,3 +29,14 @@ def load_settings() -> Settings:
         ollama_model=os.getenv("OLLAMA_MODEL", "llama3.2"),
         consumer_group_id=os.getenv("CONSUMER_GROUP_ID", "banking-ai-inspector"),
     )
+
+
+def kafka_base_config(settings: Settings) -> dict[str, str]:
+    """Shared Kafka client settings for this local macOS learning project."""
+
+    return {
+        "bootstrap.servers": settings.kafka_bootstrap_servers,
+        # macOS often resolves localhost to IPv6 first. The local Kafka container
+        # is exposed on IPv4 localhost, so this avoids confusing ::1 retries.
+        "broker.address.family": "v4",
+    }
