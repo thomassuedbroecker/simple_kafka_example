@@ -37,7 +37,7 @@ Result:
 | [#12 Add MIT license and open-source transparency docs](https://github.com/thomassuedbroecker/simple_kafka_example/issues/12) | Closed | `LICENSE`, `THIRD_PARTY_NOTICES.md`, `docs/license-review.md`, `pyproject.toml` | `d611a5c` |
 | [#13 Improve component license transparency](https://github.com/thomassuedbroecker/simple_kafka_example/issues/13) | Closed | `THIRD_PARTY_NOTICES.md`, `docs/license-review.md`, `docs/github-issues.md` | `b37d50b` |
 | [#14 Make demo run fail clearly when Kafka has no messages](https://github.com/thomassuedbroecker/simple_kafka_example/issues/14) | Closed | `src/banking_ai/consumer.py`, `src/banking_ai/config.py`, `scripts/consume_and_inspect.sh`, `README.md`, `tests/test_config.py` | `f19fc85` |
-| [#15 Reorder README around objective and expected results](https://github.com/thomassuedbroecker/simple_kafka_example/issues/15) | Closed | `README.md`, `docs/github-issues.md` | Pending commit |
+| [#15 Reorder README around objective and expected results](https://github.com/thomassuedbroecker/simple_kafka_example/issues/15) | Closed | `README.md`, `docs/github-issues.md` | `6bc4b9c` |
 
 Issue [#11](https://github.com/thomassuedbroecker/simple_kafka_example/issues/11) is closed as a duplicate of #10.
 
