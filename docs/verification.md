@@ -91,6 +91,7 @@ CONSUMER_GROUP_ID=banking-ai-inspector-verify \
 
 Result:
 
+```text
 Received transaction: txn-1010
 Rule findings:
 - amount_greater_than_1000

@@ -70,10 +70,12 @@ Start a local container runner such as Docker Desktop, Rancher Desktop, or Colim
 
 ```bash
 ./scripts/start.sh
-./scripts/create_topics.sh
+PYTHON=.venv/bin/python ./scripts/create_topics.sh
 ```
 
 The Kafka broker runs in KRaft mode, which means there is no ZooKeeper container.
+
+The Python helper scripts use `${PYTHON:-python3}`. If your virtual environment is not activated, prefix them with `PYTHON=.venv/bin/python` as shown above.
 
 ## Start Ollama
 
@@ -97,16 +99,22 @@ You can choose a different local model with:
 export OLLAMA_MODEL=llama3.2
 ```
 
+For example, the Rancher Desktop verification in this repository used an installed qwen 30B model:
+
+```bash
+export OLLAMA_MODEL=qwen3-coder:30b
+```
+
 ## Produce Demo Transactions
 
 ```bash
-python -m banking_ai.producer
+PYTHON=.venv/bin/python ./scripts/produce_demo_transactions.sh
 ```
 
-or:
+or, with an activated virtual environment:
 
 ```bash
-./scripts/produce_demo_transactions.sh
+python -m banking_ai.producer
 ```
 
 The producer sends at least 10 predefined fake transactions. Some are normal and some are suspicious.
@@ -114,13 +122,13 @@ The producer sends at least 10 predefined fake transactions. Some are normal and
 ## Consume And Inspect Transactions
 
 ```bash
-python -m banking_ai.consumer --max-messages 10
+PYTHON=.venv/bin/python MAX_MESSAGES=10 ./scripts/consume_and_inspect.sh
 ```
 
-or:
+or, with an activated virtual environment:
 
 ```bash
-./scripts/consume_and_inspect.sh
+python -m banking_ai.consumer --max-messages 10
 ```
 
 Example output shape:
@@ -187,7 +195,7 @@ Kafka is not reachable:
 
 ```bash
 ./scripts/start.sh
-./scripts/create_topics.sh
+PYTHON=.venv/bin/python ./scripts/create_topics.sh
 ```
 
 Check that your local container runner is running and that port `9092` is free.
@@ -215,6 +223,14 @@ Python cannot import `banking_ai`:
 ```bash
 source .venv/bin/activate
 pip install -e ".[dev]"
+```
+
+If you do not activate the virtual environment, run the project scripts with:
+
+```bash
+PYTHON=.venv/bin/python ./scripts/create_topics.sh
+PYTHON=.venv/bin/python ./scripts/produce_demo_transactions.sh
+PYTHON=.venv/bin/python MAX_MESSAGES=10 ./scripts/consume_and_inspect.sh
 ```
 
 ## Learning Exercises
