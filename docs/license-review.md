@@ -12,12 +12,14 @@ The repository now has an explicit MIT license for project code and package meta
 
 Highest-risk issue addressed: the repository previously had no project license, which made reuse and redistribution ambiguous. That is now remediated by `LICENSE`, `pyproject.toml` metadata, README links, and `THIRD_PARTY_NOTICES.md`.
 
+The third-party notice inventory now documents each visible component with version checked, license evidence, upstream source link, purpose, and whether the artifact is bundled in this repository.
+
 ## Findings
 
 | Finding | Evidence | Impact | Status |
 | --- | --- | --- | --- |
 | Missing project license | No `LICENSE` file or `project.license` metadata existed before this update | External users could not clearly know reuse, modification, or redistribution rights | Fixed with MIT license |
-| Missing third-party notice inventory | Dependencies were declared in `pyproject.toml`, but no notice file summarized dependency licenses | Reusers had to inspect package metadata manually | Fixed with `THIRD_PARTY_NOTICES.md` |
+| Missing third-party notice inventory | Dependencies were declared in `pyproject.toml`, but no notice file summarized dependency licenses | Reusers had to inspect package metadata manually | Fixed with `THIRD_PARTY_NOTICES.md`, including source links and bundled/not-bundled status |
 | Runtime model license not explicit | README referenced Ollama models, and verification used `qwen3-coder:30b`, but model files are not shipped | Users might assume model licenses are covered by the project MIT license | Fixed by documenting that model licenses must be checked separately |
 | AI-assisted provenance not explicit | The repo was built through AI-assisted implementation and review, but no license/provenance note existed | Future due diligence may need review evidence and scope boundaries | Partially addressed with this review and verification docs |
 
@@ -41,7 +43,7 @@ Notable transitive licenses observed:
 - `typing_extensions`: PSF-2.0.
 - Several dependencies use MIT, BSD, or Apache-style licenses.
 
-See [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) for the local inventory.
+See [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) for the component-level inventory, including direct dependencies, transitive dependencies observed in the local environment, the Kafka container image, Ollama, and documented local model references.
 
 ## Risk Consequence Matrix
 

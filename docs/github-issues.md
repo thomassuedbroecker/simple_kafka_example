@@ -224,3 +224,23 @@ Acceptance criteria:
 Traceability: repository governance and open-source transparency.
 
 Issue [#11](https://github.com/thomassuedbroecker/simple_kafka_example/issues/11) was created as a duplicate of GH-010 and is closed as duplicate.
+
+## GH-013: Improve component license transparency
+
+GitHub issue: https://github.com/thomassuedbroecker/simple_kafka_example/issues/13
+
+Labels: `documentation`
+
+Body:
+
+Add a transparent component-level license inventory for the repository.
+
+Acceptance criteria:
+
+- Document direct Python dependency licenses with versions, license evidence, source links, purpose, and bundled/not-bundled status.
+- Document transitive dependencies observed in the local verification environment.
+- Document local runtime components such as Apache Kafka container image and Ollama.
+- Document local Ollama model licensing boundaries, including `qwen3-coder:30b` and `llama3.2` notes.
+- Link the license review to the component inventory.
+
+Traceability: open-source transparency and license due-diligence documentation.
