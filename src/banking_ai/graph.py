@@ -27,6 +27,11 @@ def build_explanation_prompt(state: AgentState) -> str:
         or "- no deterministic rule was triggered"
     )
     status = "SUSPICIOUS" if state.suspicious else "NORMAL"
+    rule_instruction = (
+        "The rule findings listed above were triggered. Do not say that no rule was triggered."
+        if state.findings
+        else "No deterministic rule was triggered."
+    )
 
     return f"""You are explaining a local learning example, not making a real banking decision.
 
@@ -42,6 +47,7 @@ Transaction:
 Deterministic rule status: {status}
 Rule findings:
 {finding_lines}
+Rule instruction: {rule_instruction}
 
 Write a short plain-language inspection. Include:
 1. whether this looks normal or suspicious

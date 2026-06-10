@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-python -m banking_ai.kafka_admin
+"${PYTHON:-python3}" -m banking_ai.kafka_admin

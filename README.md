@@ -29,7 +29,7 @@ The runtime flow is:
 producer -> Kafka topic -> consumer -> rules -> LangGraph -> Ollama -> streamed terminal output
 ```
 
-Traceability from learning intent to code is maintained in [docs/traceability.md](docs/traceability.md). GitHub issue definitions and links for the main work topics are in [docs/github-issues.md](docs/github-issues.md).
+Traceability from learning intent to code is maintained in [docs/traceability.md](docs/traceability.md). GitHub issue definitions and links for the main work topics are in [docs/github-issues.md](docs/github-issues.md). Runtime verification notes are in [docs/verification.md](docs/verification.md).
 
 To create the GitHub issues from the local backlog after authenticating `gh`:
 
