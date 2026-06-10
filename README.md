@@ -40,6 +40,19 @@ gh auth login
 ./scripts/create_github_issues.sh
 ```
 
+## Learning Objective Traceability
+
+Use [docs/traceability.md](docs/traceability.md) to trace each learning objective to implementation files, tests, verification commands, and GitHub issues.
+
+| Learning objective | Trace |
+| --- | --- |
+| Kafka topic, producer, consumer, message key, message value, consumer group, offsets, and JSON payloads | [LI-001 to LI-003](docs/traceability.md#traceability-matrix) |
+| Deterministic banking transaction inspection rules | [LI-004](docs/traceability.md#traceability-matrix) |
+| Typed models for transaction, findings, inspection result, and graph state | [LI-005](docs/traceability.md#traceability-matrix) |
+| LangGraph state flow | [LI-006](docs/traceability.md#traceability-matrix) |
+| Local Ollama streaming without external AI APIs | [LI-007](docs/traceability.md#traceability-matrix) |
+| Local macOS/Rancher Desktop run scripts and infrastructure-free tests | [LI-008 to LI-010](docs/traceability.md#traceability-matrix) |
+
 ## Kafka Basics In This Project
 
 - Topic: `banking.transactions` is the named stream of transaction events.
