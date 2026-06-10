@@ -53,6 +53,90 @@ Use [docs/traceability.md](docs/traceability.md) to trace each learning objectiv
 | Local Ollama streaming without external AI APIs | [LI-007](docs/traceability.md#traceability-matrix) |
 | Local macOS/Rancher Desktop run scripts and infrastructure-free tests | [LI-008 to LI-010](docs/traceability.md#traceability-matrix) |
 
+## Quick Start
+
+Use this path when you want to run the full example from a clean checkout on macOS.
+
+1. Create and install the Python environment:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+```
+
+2. Start your local container runner, such as Rancher Desktop, Docker Desktop, or Colima.
+
+3. Start Kafka and create the topic:
+
+```bash
+./scripts/start.sh
+sleep 10
+PYTHON=.venv/bin/python ./scripts/create_topics.sh
+```
+
+4. Make sure Ollama is running and choose a local model:
+
+```bash
+ollama serve
+```
+
+In another terminal:
+
+```bash
+export OLLAMA_MODEL=qwen3-coder:30b
+```
+
+If you want to use the default model instead:
+
+```bash
+ollama pull llama3.2
+export OLLAMA_MODEL=llama3.2
+```
+
+5. Produce demo transactions:
+
+```bash
+PYTHON=.venv/bin/python ./scripts/produce_demo_transactions.sh
+```
+
+6. Consume and inspect transactions with streamed terminal output:
+
+```bash
+PYTHON=.venv/bin/python MAX_MESSAGES=10 ./scripts/consume_and_inspect.sh
+```
+
+7. Run the unit tests:
+
+```bash
+.venv/bin/python -m pytest
+```
+
+## Clean Up
+
+Stop and remove the local Kafka container and Docker Compose network:
+
+```bash
+./scripts/stop.sh
+```
+
+Leave Ollama installed, but stop `ollama serve` with `Ctrl+C` in the terminal where it is running.
+
+Remove the Python virtual environment if you want a fully clean local checkout:
+
+```bash
+deactivate
+rm -rf .venv
+```
+
+Optional Docker image cleanup if you want to reclaim disk space:
+
+```bash
+docker rmi apache/kafka:3.8.1
+```
+
+This project does not define a persistent Kafka volume, so `./scripts/stop.sh` removes the Kafka container state for this example.
+
 ## Kafka Basics In This Project
 
 - Topic: `banking.transactions` is the named stream of transaction events.
