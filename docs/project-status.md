@@ -43,7 +43,7 @@ Result:
 | [#18 Document executed test coverage details](https://github.com/thomassuedbroecker/simple_kafka_example/issues/18) | Closed | `.github/workflows/tests.yml`, `README.md`, `docs/verification.md`, `docs/github-issues.md` | `dcbc468` |
 | [#19 Add README project icon](https://github.com/thomassuedbroecker/simple_kafka_example/issues/19) | Closed as superseded | Request clarified as test execution status badge | No implementation commit |
 | [#20 Add README test execution status badge](https://github.com/thomassuedbroecker/simple_kafka_example/issues/20) | Closed | `README.md`, `.github/workflows/tests.yml`, `docs/github-issues.md`, `docs/project-status.md` | `b7bdb98` |
-| [#21 Switch default Ollama model to qwen3-coder 30B](https://github.com/thomassuedbroecker/simple_kafka_example/issues/21) | Closed | `src/banking_ai/config.py`, `src/banking_ai/ollama_client.py`, `.env.example`, `README.md`, `docs/traceability.md`, `docs/verification.md` | Pending commit |
+| [#21 Switch default Ollama model to qwen3-coder 30B](https://github.com/thomassuedbroecker/simple_kafka_example/issues/21) | Closed | `src/banking_ai/config.py`, `src/banking_ai/ollama_client.py`, `.env.example`, `README.md`, `docs/traceability.md`, `docs/verification.md` | `d170425` |
 
 Issue [#11](https://github.com/thomassuedbroecker/simple_kafka_example/issues/11) is closed as a duplicate of #10.
 
