@@ -409,3 +409,26 @@ Acceptance criteria:
 - Commit references this issue.
 
 Traceability: local Ollama execution and developer experience.
+
+## GH-022: Add local results UI for AI inspection output
+
+GitHub issue: https://github.com/thomassuedbroecker/simple_kafka_example/issues/22
+
+Labels: `ai`, `developer-experience`, `documentation`
+
+Body:
+
+Add a small local browser UI that shows deterministic rule findings and streamed Ollama inspection output.
+
+Acceptance criteria:
+
+- Add a lightweight local UI command without cloud services or API keys.
+- UI lets learners select a predefined demo transaction.
+- UI shows transaction details, deterministic rule findings, final status, reviewer check, and streamed AI explanation.
+- UI reuses the existing rules, LangGraph workflow, and Ollama client.
+- README explains how this UI relates to Kafbat UI and the terminal flow.
+- Traceability, issue docs, project status, and verification docs are updated.
+- Tests and `docker compose config` pass.
+- Commit references this issue.
+
+Traceability: local AI streaming visibility and beginner learning workflow.

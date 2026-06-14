@@ -15,11 +15,13 @@ This matrix connects the learning intent to requirements, implementation files, 
 | LI-009 | Provide clear beginner documentation explaining why each part exists. | `README.md`, `.env.example`, `docs/traceability.md` | Documentation review against README checklist | [#9](https://github.com/thomassuedbroecker/simple_kafka_example/issues/9) |
 | LI-010 | Keep tests focused and independent from Kafka, Docker, Ollama, and network access. | `tests/test_rules.py`, `tests/test_models.py`, `tests/test_graph_state.py` | `pytest` | [#10](https://github.com/thomassuedbroecker/simple_kafka_example/issues/10) |
 | LI-011 | Use Kafbat UI to visually inspect topics, messages, consumer groups, partitions, and offsets. | `docker-compose.yml`, `scripts/start.sh`, `README.md` | `docker compose config`, manual: open `http://localhost:8080` | [#16](https://github.com/thomassuedbroecker/simple_kafka_example/issues/16) |
+| LI-012 | Use a local Results UI to inspect deterministic findings and streamed AI explanations in a browser. | `src/banking_ai/results_ui.py`, `scripts/start_results_ui.sh`, `README.md` | `tests/test_results_ui.py`, manual: open `http://127.0.0.1:8081` | [#22](https://github.com/thomassuedbroecker/simple_kafka_example/issues/22) |
 
 ## Forward Traceability
 
 - Kafka learning goals map to `docker-compose.yml`, `kafka_admin.py`, `producer.py`, and `consumer.py`.
 - Kafka UI visibility maps to `docker-compose.yml`, `scripts/start.sh`, and the Kafbat UI learning step in the README.
+- Results UI visibility maps to `results_ui.py`, `scripts/start_results_ui.sh`, and the Results UI learning step in the README.
 - Rule-learning goals map to `rules.py` and `tests/test_rules.py`.
 - LangGraph-learning goals map to `graph.py` and `tests/test_graph_state.py`.
 - Local AI streaming goals map to `ollama_client.py` and the streaming callback in `consumer.py`.
@@ -33,6 +35,7 @@ This matrix connects the learning intent to requirements, implementation files, 
 - `ollama_client.py` exists to satisfy LI-007 without external AI APIs.
 - `tests/` exists to satisfy LI-010 and verify core behavior without infrastructure.
 - The Kafbat UI service exists to satisfy LI-011 without changing the core terminal-first producer and consumer flow.
+- `results_ui.py` exists to satisfy LI-012 by showing the existing inspection workflow in a browser.
 
 ## Issue To Code Index
 
@@ -47,3 +50,4 @@ This matrix connects the learning intent to requirements, implementation files, 
 - [#9](https://github.com/thomassuedbroecker/simple_kafka_example/issues/9): `README.md`, `.env.example`, `docs/traceability.md`, `docs/github-issues.md`
 - [#10](https://github.com/thomassuedbroecker/simple_kafka_example/issues/10): `tests/test_rules.py`, `tests/test_models.py`, `tests/test_graph_state.py`
 - [#16](https://github.com/thomassuedbroecker/simple_kafka_example/issues/16): `docker-compose.yml`, `scripts/start.sh`, `README.md`
+- [#22](https://github.com/thomassuedbroecker/simple_kafka_example/issues/22): `src/banking_ai/results_ui.py`, `scripts/start_results_ui.sh`, `tests/test_results_ui.py`, `README.md`

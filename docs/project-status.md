@@ -44,6 +44,7 @@ Result:
 | [#19 Add README project icon](https://github.com/thomassuedbroecker/simple_kafka_example/issues/19) | Closed as superseded | Request clarified as test execution status badge | No implementation commit |
 | [#20 Add README test execution status badge](https://github.com/thomassuedbroecker/simple_kafka_example/issues/20) | Closed | `README.md`, `.github/workflows/tests.yml`, `docs/github-issues.md`, `docs/project-status.md` | `b7bdb98` |
 | [#21 Switch default Ollama model to qwen3-coder 30B](https://github.com/thomassuedbroecker/simple_kafka_example/issues/21) | Closed | `src/banking_ai/config.py`, `src/banking_ai/ollama_client.py`, `.env.example`, `README.md`, `docs/traceability.md`, `docs/verification.md` | `d170425` |
+| [#22 Add local results UI for AI inspection output](https://github.com/thomassuedbroecker/simple_kafka_example/issues/22) | Closed | `src/banking_ai/results_ui.py`, `scripts/start_results_ui.sh`, `tests/test_results_ui.py`, `README.md`, `docs/traceability.md` | Pending commit |
 
 Issue [#11](https://github.com/thomassuedbroecker/simple_kafka_example/issues/11) is closed as a duplicate of #10.
 
@@ -58,7 +59,7 @@ Latest local verification:
 Result:
 
 ```text
-10 passed
+12 passed
 ```
 
 Runtime verification with Rancher Desktop and Ollama is recorded in [docs/verification.md](verification.md).

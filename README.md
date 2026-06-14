@@ -18,6 +18,7 @@ By the end, you should be able to explain:
 
 - Kafka topic, producer, consumer, message key, message value, consumer group, offset, and JSON payload basics.
 - How Kafbat UI can show the topic, messages, consumer group, and offsets visually.
+- How the local Results UI shows deterministic findings and streamed AI explanation text.
 - Why deterministic transaction rules run before the LLM explanation.
 - How LangGraph moves inspection state through small workflow nodes.
 - Where Ollama streams local AI output in the terminal.
@@ -70,6 +71,7 @@ flowchart LR
     D --> E[LangGraph Agent]
     E --> F[Ollama Local LLM]
     F --> G[Streamed Terminal Explanation]
+    F --> I[Results UI: streamed AI inspection]
 ```
 
 ## Run The Example
@@ -241,9 +243,41 @@ Run the producer first with: PYTHON=.venv/bin/python ./scripts/produce_demo_tran
 If you already consumed these messages, use a new CONSUMER_GROUP_ID to replay them.
 ```
 
-### 7. Run Tests
+### 7. Open The Results UI
 
-What you learn: the rule logic, model validation, Kafka config, and graph state behavior can be verified without Kafka, containers, Ollama, or network access. Official resource: [pytest documentation](https://docs.pytest.org/en/stable/).
+What you learn: Kafbat UI shows Kafka internals, while this small project UI shows the inspection result: transaction details, deterministic rule findings, final status, reviewer check, and streamed Ollama explanation.
+
+Start the local results UI:
+
+```bash
+PYTHON=.venv/bin/python ./scripts/start_results_ui.sh
+```
+
+Open:
+
+```text
+http://127.0.0.1:8081
+```
+
+Expected result:
+
+```text
+Results UI: http://127.0.0.1:8081
+Press Ctrl+C to stop.
+```
+
+In the browser:
+
+- Select a predefined transaction.
+- Click `Inspect with local AI`.
+- Watch the AI explanation stream into the page.
+- Compare normal and suspicious transactions.
+
+This UI reuses the same deterministic rules, LangGraph workflow, and Ollama client as the terminal consumer. It does not replace Kafka or Kafbat UI; it focuses on the final inspection result.
+
+### 8. Run Tests
+
+What you learn: the rule logic, model validation, Kafka config, Results UI helpers, and graph state behavior can be verified without Kafka, containers, Ollama, or network access. Official resource: [pytest documentation](https://docs.pytest.org/en/stable/).
 
 ```bash
 .venv/bin/python -m pytest
@@ -252,14 +286,14 @@ What you learn: the rule logic, model validation, Kafka config, and graph state 
 Expected result:
 
 ```text
-10 passed
+12 passed
 ```
 
 The [Tests workflow](.github/workflows/tests.yml) runs two independent gates:
 
 | Gate | Command | What it proves |
 | --- | --- | --- |
-| Python unit tests | `python -m pytest` | Rules, Pydantic models, LangGraph state flow, fake Ollama streaming, and local Kafka client config work without Docker, Kafka, Ollama, or network access. |
+| Python unit tests | `python -m pytest` | Rules, Pydantic models, LangGraph state flow, fake Ollama streaming, local Kafka client config, and Results UI helpers work without Docker, Kafka, Ollama, or network access. |
 | Docker Compose configuration | `docker compose config` | The Kafka and Kafbat UI Compose configuration is syntactically valid and renders the intended services, ports, and listener settings. |
 
 ## Clean Up
@@ -293,6 +327,7 @@ This project does not define a persistent Kafka volume. After `./scripts/stop.sh
 
 - Kafka teaches event streaming: a producer writes events into a named topic, and a consumer reads those events later.
 - Kafbat UI helps you see the topic, messages, consumer group, partitions, and offsets while learning.
+- Results UI helps you inspect the final rule and AI output in a browser.
 - Ollama runs an LLM locally without API keys, cloud services, or external AI APIs.
 - LangGraph makes the inspection flow explicit as small state transitions.
 - Deterministic rules run before the LLM because important decisions should not depend only on generated text.
@@ -307,6 +342,7 @@ This project does not define a persistent Kafka volume. After `./scripts/stop.sh
 - Consumer group: `banking-ai-inspector` lets Kafka coordinate which consumer instance reads which messages.
 - Offset: Kafka tracks each consumer group's position in the topic. This example commits an offset only after a transaction was inspected successfully.
 - Kafbat UI: `http://localhost:8080` shows the local Kafka cluster, topic, messages, consumer group, and offsets.
+- Results UI: `http://127.0.0.1:8081` shows transaction details, rule findings, final status, reviewer check, and streamed AI explanation.
 
 ### Offsets And Consumer Groups
 
@@ -353,6 +389,8 @@ Copy `.env.example` if you want a local reference file. The Python code reads en
 
 The Python helper scripts use `${PYTHON:-python3}`. If your virtual environment is not activated, prefix them with `PYTHON=.venv/bin/python`.
 
+The Results UI is a local Python process started with `scripts/start_results_ui.sh`; it is not a container and does not call external AI APIs.
+
 ## Documentation And Traceability
 
 Traceability from learning intent to code is maintained in [docs/traceability.md](docs/traceability.md). GitHub issue definitions and links for the main work topics are in [docs/github-issues.md](docs/github-issues.md). Runtime verification notes are in [docs/verification.md](docs/verification.md), and issue completion status is summarized in [docs/project-status.md](docs/project-status.md).
@@ -378,6 +416,14 @@ docker compose logs kafbat-ui
 ```
 
 Check that port `8080` is free and open `http://localhost:8080`.
+
+Results UI is not reachable:
+
+```bash
+PYTHON=.venv/bin/python ./scripts/start_results_ui.sh
+```
+
+Check that port `8081` is free and open `http://127.0.0.1:8081`.
 
 Ollama is not reachable:
 
@@ -413,3 +459,4 @@ pip install -e ".[dev]"
 - Add another consumer in the same group and observe how Kafka coordinates reads.
 - Extend the LangGraph state with a reviewer note.
 - Compare two local Ollama models and observe speed and explanation differences.
+- Extend the Results UI to read inspected records from the optional `banking.transaction.inspections` topic.
