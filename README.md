@@ -1,5 +1,7 @@
 # Local Kafka + LangGraph Banking AI
 
+> Note: this repository is supported and primarily developed with AI assistance from Codex, Copilot, and IBM Bob.
+
 [![Tests](https://github.com/thomassuedbroecker/simple_kafka_example/actions/workflows/tests.yml/badge.svg)](https://github.com/thomassuedbroecker/simple_kafka_example/actions/workflows/tests.yml)
 
 This is a small local-first learning project for macOS on Apple Silicon. It shows how a Python producer writes fake banking transactions into Kafka, how a consumer reads them back, how deterministic inspection rules run first, and how a small LangGraph workflow streams a local Ollama explanation to the terminal and the local Results UI.
