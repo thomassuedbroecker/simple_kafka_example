@@ -1,12 +1,34 @@
 # Local Kafka + LangGraph Banking AI
 
-> Note: this repository is supported and primarily developed with AI assistance from Codex, Copilot, and IBM Bob.
+> Note: this repository is supported and primarily developed with AI assistance from Codex, Copilot, Claude AI, and IBM Bob.
 
 [![Tests](https://github.com/thomassuedbroecker/simple_kafka_example/actions/workflows/tests.yml/badge.svg)](https://github.com/thomassuedbroecker/simple_kafka_example/actions/workflows/tests.yml)
 
 This is a small local-first learning project for macOS on Apple Silicon. It shows how a Python producer writes fake banking transactions into Kafka, how a consumer reads them back, how deterministic inspection rules run first, and how a small LangGraph workflow streams a local Ollama explanation to the terminal and the local Results UI.
 
-This project is for learning. It is not a production banking system, fraud engine, security reference architecture, or scalable Kafka deployment.
+## What This Is Not
+
+This project is for learning. It is **not**:
+
+- a production banking system, fraud engine, or security reference architecture
+- a scalable or multi-broker Kafka deployment
+- a Kubernetes project (Kubernetes is out of scope; see [ADR 0004](docs/adr/0004-no-kubernetes.md))
+- a user of any external or cloud AI API
+- a user of real banking data
+
+## Local Runtime Requirements
+
+- macOS Apple Silicon.
+- **Rancher Desktop is used only as the local container runtime.** Kubernetes is
+  not used and should be disabled in Rancher Desktop. The project uses
+  `docker compose` commands through Rancher Desktop. Any Docker-compatible
+  runtime (Docker Desktop, Colima) also works.
+- Ollama installed and running locally on macOS. No external AI API or API key
+  is required.
+- Python 3.12+.
+
+See [docs/local-execution.md](docs/local-execution.md) for the full local setup,
+and [docs/troubleshooting.md](docs/troubleshooting.md) if something fails.
 
 ## Objective
 
@@ -86,6 +108,53 @@ The GIF below show how to inspect transactions with an AI agent.
 
 ![Example inspection of the transactions](images/inspect-transactions.gif)
 
+## Fast Path
+
+For experienced users who just want to run it. Each step is explained in detail
+in the next section. Start Rancher Desktop first (Kubernetes disabled).
+
+```bash
+# 1. Create and activate a Python environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 2. Install the project
+pip install -e ".[dev]"
+
+# 3. Start Ollama locally (in its own terminal)
+ollama serve
+
+# 4. Pull the local model
+ollama pull qwen3-coder:30b
+
+# 5. Start Kafka locally with Rancher Desktop containers
+./scripts/start.sh
+
+# 6. Create the Kafka topic
+PYTHON=.venv/bin/python ./scripts/create_topics.sh
+
+# 7. Produce demo transactions
+PYTHON=.venv/bin/python ./scripts/produce_demo_transactions.sh
+
+# 8. Consume and inspect transactions
+PYTHON=.venv/bin/python MAX_MESSAGES=10 ./scripts/consume_and_inspect.sh
+```
+
+Or run the whole happy-path demo in one transparent step:
+
+```bash
+PYTHON=.venv/bin/python ./scripts/demo.sh
+```
+
+The required learning path is:
+
+```text
+Producer -> Kafka -> Consumer -> Rules -> LangGraph -> Ollama -> Terminal
+```
+
+Kafbat UI and the Results UI are optional visibility tools, not part of the
+required path.
+
 ## Run The Example
 
 Use this order from a clean checkout. If you run the consumer before producing transactions, there is nothing to inspect.
@@ -155,11 +224,16 @@ ollama pull qwen3-coder:30b
 export OLLAMA_MODEL=qwen3-coder:30b
 ```
 
-You can still choose another local model by overriding `OLLAMA_MODEL`:
+Verify Ollama is reachable and the model is present:
 
 ```bash
-export OLLAMA_MODEL=llama3.2
+ollama list
+curl http://localhost:11434/api/tags
 ```
+
+`qwen3-coder:30b` is the default. It explains well but needs more local
+resources. If you have limited resources, override `OLLAMA_MODEL` with a smaller
+local model of your choice.
 
 ### 4. Produce Demo Transactions
 
@@ -300,7 +374,7 @@ What you learn: the rule logic, model validation, Kafka config, Results UI event
 Expected result:
 
 ```text
-14 passed
+15 passed
 ```
 
 The [Tests workflow](.github/workflows/tests.yml) runs two independent gates:
@@ -344,7 +418,7 @@ This project does not define a persistent Kafka volume. After `./scripts/stop.sh
 - Results UI helps you inspect the selected topic event, AI agent steps, final rule output, and AI output in a browser.
 - Ollama runs an LLM locally without API keys, cloud services, or external AI APIs.
 - LangGraph makes the inspection flow explicit as small state transitions.
-- Deterministic rules run before the LLM because important decisions should not depend only on generated text.
+- Deterministic rules run before the LLM because important decisions should not depend only on generated text. Each rule returns a structured `RuleFinding` with `rule_id`, `severity` (`low`, `medium`, or `high`), `reason`, and `relevant_fields`, so the result is easy to read and test. See [ADR 0002](docs/adr/0002-deterministic-rules-before-llm.md).
 
 ### Kafka Basics In This Project
 
@@ -377,7 +451,7 @@ Ollama runs the model on your machine. The consumer calls the local Ollama HTTP 
 
 No OpenAI, Anthropic, Gemini, hosted LangSmith, hosted vector database, cloud Kafka, or API key is used.
 
-Ollama models are not bundled with this repository. Check the license for any model you pull locally, such as `qwen3-coder:30b` or `llama3.2`, before redistributing model files or outputs in another project.
+Ollama models are not bundled with this repository. Check the license for any model you pull locally, such as `qwen3-coder:30b`, before redistributing model files or outputs in another project.
 
 ## Configuration
 
@@ -409,9 +483,24 @@ The Results UI is a local Python process started with `scripts/start_results_ui.
 
 Traceability from learning intent to code is maintained in [docs/traceability.md](docs/traceability.md). GitHub issue definitions and links for the main work topics are in [docs/github-issues.md](docs/github-issues.md). Runtime verification notes are in [docs/verification.md](docs/verification.md), and issue completion status is summarized in [docs/project-status.md](docs/project-status.md).
 
+Local setup and operations are documented in [docs/local-execution.md](docs/local-execution.md) and [docs/troubleshooting.md](docs/troubleshooting.md). Key design decisions are recorded as ADRs in [docs/adr/](docs/adr/): local-first with Rancher Desktop ([0001](docs/adr/0001-local-first-rancher-desktop.md)), deterministic rules before the LLM ([0002](docs/adr/0002-deterministic-rules-before-llm.md)), Kafka learning scope ([0003](docs/adr/0003-kafka-learning-scope.md)), and no Kubernetes ([0004](docs/adr/0004-no-kubernetes.md)).
+
 License transparency is documented in [LICENSE](LICENSE), [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), and [docs/license-review.md](docs/license-review.md). The project code is MIT licensed.
 
 ## Troubleshooting
+
+Quick reference matrix (full version in [docs/troubleshooting.md](docs/troubleshooting.md)):
+
+| Problem | Check | Likely fix |
+| --- | --- | --- |
+| Docker command not found | `docker version` | Enable the Docker-compatible runtime in Rancher Desktop |
+| Kafka not reachable | `docker compose ps` | Start containers with `./scripts/start.sh` |
+| Kafbat UI not reachable | open `http://localhost:8080` | Check `docker compose logs kafbat-ui` |
+| No messages consumed | change `CONSUMER_GROUP_ID` | Existing offsets were already committed; use a new group to replay |
+| Ollama not reachable | `curl http://localhost:11434/api/tags` | Start `ollama serve` |
+| Ollama model missing | `ollama list` | Run `ollama pull qwen3-coder:30b` |
+| Python import error | `pip install -e ".[dev]"` | Reinstall the package into your virtual environment |
+| Tests fail | `./scripts/verify.sh` | Fix the syntax, Compose, or test errors it reports |
 
 Kafka is not reachable:
 
@@ -474,3 +563,22 @@ pip install -e ".[dev]"
 - Extend the LangGraph state with a reviewer note.
 - Compare two local Ollama models and observe speed and explanation differences.
 - Extend the Results UI to read inspected records from the optional `banking.transaction.inspections` topic.
+
+## Local Privacy Note
+
+This project runs locally. Kafka runs in local containers using Rancher Desktop.
+Ollama runs locally on macOS. No external AI API is required. No API keys are
+required. No real banking data should be used. The project is for learning only.
+This is not a claim of production-grade privacy, security, or compliance.
+
+## Known Limitations
+
+- Single Kafka broker, single partition, KRaft mode. Not a scalable or
+  multi-broker deployment.
+- Deterministic rules are intentionally simple teaching examples, not real fraud
+  detection.
+- The LLM only explains the rule-based decision; it does not decide the status.
+- No persistent Kafka volume: stopping containers clears the topic.
+- Out of scope: Kubernetes, cloud AI APIs, real banking data, authentication,
+  real databases, and distributed deployment. See
+  [docs/project-status.md](docs/project-status.md).

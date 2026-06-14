@@ -23,7 +23,10 @@ class GraphState(TypedDict, total=False):
 def build_explanation_prompt(state: AgentState) -> str:
     transaction = state.transaction
     finding_lines = (
-        "\n".join(f"- {finding.rule_id}: {finding.reason}" for finding in state.findings)
+        "\n".join(
+            f"- {finding.rule_id} (severity: {finding.severity}): {finding.reason}"
+            for finding in state.findings
+        )
         or "- no deterministic rule was triggered"
     )
     status = "SUSPICIOUS" if state.suspicious else "NORMAL"

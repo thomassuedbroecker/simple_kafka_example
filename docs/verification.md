@@ -29,7 +29,7 @@ Python unit tests:
 Result:
 
 ```text
-14 passed
+15 passed
 ```
 
 Executed test details:
@@ -39,7 +39,7 @@ Executed test details:
 | `tests/test_config.py` | `test_kafka_base_config_uses_ipv4_for_local_mac_demo` | Shared Kafka client config uses `localhost:9092` and forces IPv4 for the local macOS container setup. | None |
 | `tests/test_graph_state.py` | `test_graph_creates_final_result_without_network`, `test_prompt_tells_model_triggered_rules_are_triggered` | LangGraph creates a final inspection result, streams fake Ollama chunks, preserves triggered rule findings, and prompts the model consistently. | None |
 | `tests/test_models.py` | `test_transaction_model_accepts_valid_transaction`, `test_transaction_model_rejects_negative_amount` | Pydantic validates valid banking transactions and rejects invalid negative amounts. | None |
-| `tests/test_rules.py` | `test_normal_transaction_has_no_findings`, `test_large_amount_is_suspicious`, `test_foreign_country_is_suspicious`, `test_large_cash_withdrawal_is_suspicious`, `test_suspicious_merchant_keyword_is_suspicious` | Deterministic rules correctly classify normal transactions and each suspicious rule trigger. | None |
+| `tests/test_rules.py` | `test_normal_transaction_has_no_findings`, `test_large_amount_is_suspicious`, `test_foreign_country_is_suspicious`, `test_large_cash_withdrawal_is_suspicious`, `test_suspicious_merchant_keyword_is_suspicious`, `test_findings_carry_a_severity` | Deterministic rules correctly classify normal transactions, each suspicious rule trigger, and assign a `severity` (`low`/`medium`/`high`) to each finding. | None |
 | `tests/test_results_ui.py` | `test_results_ui_finds_demo_transaction`, `test_results_ui_rejects_unknown_transaction`, `test_results_ui_builds_kafka_topic_event`, `test_results_ui_builds_all_demo_topic_events` | Results UI helper finds predefined demo transactions, rejects unknown ids, and renders demo transactions as Kafka topic events with topic, key, and JSON value without starting the web server. | None |
 
 The [Tests workflow](../.github/workflows/tests.yml) runs two independent gates:

@@ -17,6 +17,7 @@ def inspect_transaction_rules(transaction: BankingTransaction) -> list[RuleFindi
         findings.append(
             RuleFinding(
                 rule_id="amount_greater_than_1000",
+                severity="medium",
                 reason="The transaction amount is greater than 1000.",
                 relevant_fields=["amount"],
             )
@@ -26,6 +27,7 @@ def inspect_transaction_rules(transaction: BankingTransaction) -> list[RuleFindi
         findings.append(
             RuleFinding(
                 rule_id="foreign_country",
+                severity="low",
                 reason="The transaction country is outside the simple trusted country list.",
                 relevant_fields=["country"],
             )
@@ -38,6 +40,7 @@ def inspect_transaction_rules(transaction: BankingTransaction) -> list[RuleFindi
         findings.append(
             RuleFinding(
                 rule_id="large_cash_withdrawal",
+                severity="medium",
                 reason="Cash withdrawals above 500 should be reviewed.",
                 relevant_fields=["transaction_type", "amount"],
             )
@@ -51,6 +54,7 @@ def inspect_transaction_rules(transaction: BankingTransaction) -> list[RuleFindi
         findings.append(
             RuleFinding(
                 rule_id="suspicious_merchant_keyword",
+                severity="high",
                 reason=(
                     "The merchant name contains a simple suspicious keyword: "
                     + ", ".join(matched_words)

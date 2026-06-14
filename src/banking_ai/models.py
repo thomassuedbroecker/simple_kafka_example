@@ -17,8 +17,12 @@ class BankingTransaction(BaseModel):
     transaction_type: str = Field(min_length=1)
 
 
+Severity = Literal["low", "medium", "high"]
+
+
 class RuleFinding(BaseModel):
     rule_id: str
+    severity: Severity = "medium"
     reason: str
     relevant_fields: list[str]
     suspicious: bool = True

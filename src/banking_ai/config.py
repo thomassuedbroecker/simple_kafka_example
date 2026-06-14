@@ -14,6 +14,8 @@ class Settings:
     transaction_topic: str = "banking.transactions"
     inspection_topic: str = "banking.transaction.inspections"
     ollama_base_url: str = "http://localhost:11434"
+    # Default local model. Override with OLLAMA_MODEL to use a smaller model if
+    # you have limited local resources.
     ollama_model: str = "qwen3-coder:30b"
     consumer_group_id: str = "banking-ai-inspector"
 

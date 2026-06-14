@@ -233,7 +233,8 @@ HTML_PAGE = """<!doctype html>
       }
       for (const item of items) {
         const li = document.createElement("li");
-        li.textContent = `${item.rule_id}: ${item.reason}`;
+        const severity = item.severity ? ` [${item.severity}]` : "";
+        li.textContent = `${item.rule_id}${severity}: ${item.reason}`;
         findings.appendChild(li);
       }
     }
