@@ -6,7 +6,7 @@ GitHub repository: `thomassuedbroecker/simple_kafka_example`
 
 ## Current Status
 
-Issue #23 is in progress to make the Results UI show the Kafka topic event and AI agent flow in one web app.
+Issue #24 is in progress to add the existing demo GIF to the README.
 
 Open issue check:
 
@@ -19,10 +19,10 @@ Result:
 ```json
 [
   {
-    "number": 23,
+    "number": 24,
     "state": "OPEN",
-    "title": "Show Kafka topic event and AI agent flow in Results UI",
-    "url": "https://github.com/thomassuedbroecker/simple_kafka_example/issues/23"
+    "title": "Add demo GIF to README",
+    "url": "https://github.com/thomassuedbroecker/simple_kafka_example/issues/24"
   }
 ]
 ```
@@ -52,7 +52,8 @@ Result:
 | [#20 Add README test execution status badge](https://github.com/thomassuedbroecker/simple_kafka_example/issues/20) | Closed | `README.md`, `.github/workflows/tests.yml`, `docs/github-issues.md`, `docs/project-status.md` | `b7bdb98` |
 | [#21 Switch default Ollama model to qwen3-coder 30B](https://github.com/thomassuedbroecker/simple_kafka_example/issues/21) | Closed | `src/banking_ai/config.py`, `src/banking_ai/ollama_client.py`, `.env.example`, `README.md`, `docs/traceability.md`, `docs/verification.md` | `d170425` |
 | [#22 Add local results UI for AI inspection output](https://github.com/thomassuedbroecker/simple_kafka_example/issues/22) | Closed | `src/banking_ai/results_ui.py`, `scripts/start_results_ui.sh`, `tests/test_results_ui.py`, `README.md`, `docs/traceability.md`, `docs/verification.md`, `docs/project-status.md` | `7dc3ea2`, `4942594` |
-| [#23 Show Kafka topic event and AI agent flow in Results UI](https://github.com/thomassuedbroecker/simple_kafka_example/issues/23) | In progress | `src/banking_ai/results_ui.py`, `tests/test_results_ui.py`, `README.md`, `docs/traceability.md`, `docs/verification.md`, `docs/github-issues.md` | Pending commit |
+| [#23 Show Kafka topic event and AI agent flow in Results UI](https://github.com/thomassuedbroecker/simple_kafka_example/issues/23) | Closed | `src/banking_ai/results_ui.py`, `tests/test_results_ui.py`, `README.md`, `docs/traceability.md`, `docs/verification.md`, `docs/github-issues.md` | `b75bdae` |
+| [#24 Add demo GIF to README](https://github.com/thomassuedbroecker/simple_kafka_example/issues/24) | In progress | `README.md`, `images/kafbat-ui-1ß.gif`, `docs/github-issues.md`, `docs/project-status.md` | Pending commit |
 
 Issue [#11](https://github.com/thomassuedbroecker/simple_kafka_example/issues/11) is closed as a duplicate of #10.
 

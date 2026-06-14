@@ -454,3 +454,22 @@ Acceptance criteria:
 - Commit references this issue.
 
 Traceability: topic-event visibility, local AI streaming visibility, and beginner learning workflow.
+
+## GH-024: Add demo GIF to README
+
+GitHub issue: https://github.com/thomassuedbroecker/simple_kafka_example/issues/24
+
+Labels: `documentation`
+
+Body:
+
+Add the existing demo GIF to README so users can see the local UI flow visually.
+
+Acceptance criteria:
+
+- README embeds the GIF with useful alt text.
+- The image file is tracked in git.
+- Project status and GitHub issue docs reference this documentation change.
+- Commit references this issue.
+
+Traceability: beginner documentation and visual run-flow evidence.

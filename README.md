@@ -74,6 +74,12 @@ flowchart LR
     F --> I[Results UI: topic event and AI agent result]
 ```
 
+## Demo GIF
+
+The GIF below shows the local browser UI for inspecting Kafka learning data:
+
+![Kafbat UI and local inspection flow](images/kafbat-ui-1ß.gif)
+
 ## Run The Example
 
 Use this order from a clean checkout. If you run the consumer before producing transactions, there is nothing to inspect.
