@@ -1,6 +1,6 @@
 # Third-Party Notices
 
-Date checked: 2026-06-10
+Date checked: 2026-06-10. Re-verified: 2026-06-14 — all 38 installed packages were confirmed to carry an OSI-approved license (no unknown licenses). Regenerate this inventory with `scripts/license_report.sh`.
 
 This project is MIT licensed. It also uses third-party packages, a local Kafka container image, Ollama, and user-selected local Ollama models.
 
@@ -50,7 +50,7 @@ These packages were present in the local verification environment because of the
 | `langgraph-checkpoint` | 4.1.1 | MIT license expression | <https://github.com/langchain-ai/langgraph/tree/main/libs/checkpoint> |
 | `langgraph-prebuilt` | 1.1.0 | MIT license expression | <https://github.com/langchain-ai/langgraph/tree/main/libs/prebuilt> |
 | `langgraph-sdk` | 0.4.2 | MIT license expression | <https://github.com/langchain-ai/langgraph/tree/main/libs/sdk-py> |
-| `langsmith` | 0.8.11 | MIT | <https://github.com/langchain-ai/langsmith-sdk> |
+| `langsmith` | 0.8.12 | MIT | <https://github.com/langchain-ai/langsmith-sdk> |
 | `orjson` | 3.11.9 | MPL-2.0 AND (Apache-2.0 OR MIT) | <https://github.com/ijl/orjson> |
 | `ormsgpack` | 1.12.2 | Apache-2.0 OR MIT | <https://github.com/ormsgpack/ormsgpack> |
 | `packaging` | 26.2 | Apache-2.0 OR BSD-2-Clause | <https://github.com/pypa/packaging> |

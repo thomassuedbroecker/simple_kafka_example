@@ -508,7 +508,7 @@ Traceability from learning intent to code is maintained in [docs/traceability.md
 
 Local setup and operations are documented in [docs/local-execution.md](docs/local-execution.md) and [docs/troubleshooting.md](docs/troubleshooting.md). Key design decisions are recorded as ADRs in [docs/adr/](docs/adr/): local-first with Rancher Desktop ([0001](docs/adr/0001-local-first-rancher-desktop.md)), deterministic rules before the LLM ([0002](docs/adr/0002-deterministic-rules-before-llm.md)), Kafka learning scope ([0003](docs/adr/0003-kafka-learning-scope.md)), and no Kubernetes ([0004](docs/adr/0004-no-kubernetes.md)).
 
-License transparency is documented in [LICENSE](LICENSE), [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), and [docs/license-review.md](docs/license-review.md). The project code is MIT licensed.
+License transparency is documented in [LICENSE](LICENSE), [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), and [docs/license-review.md](docs/license-review.md). The project code is MIT licensed. Run `PYTHON=.venv/bin/python ./scripts/license_report.sh` to list every installed dependency's license and fail if any package lacks a detectable open-source license.
 
 ## Troubleshooting
 

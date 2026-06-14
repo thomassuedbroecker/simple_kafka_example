@@ -1,6 +1,6 @@
 # License Review
 
-Date checked: 2026-06-10
+Date checked: 2026-06-10. Re-verified: 2026-06-14 (all 38 installed packages confirmed OSI-licensed via `scripts/license_report.sh`).
 
 Scope: repository source code, package metadata, Python dependencies installed in `.venv`, Docker Compose runtime image reference, and local Ollama/model usage notes.
 
@@ -55,17 +55,17 @@ See [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) for the component-level 
 
 ## Repository Health Score
 
-Current license health score: 86 / 100.
+Current license health score: 90 / 100.
 
 Rationale:
 
 - Project license: 25 / 25.
 - Package metadata: 20 / 20.
-- Dependency transparency: 20 / 25.
+- Dependency transparency: 21 / 25.
 - Runtime/model transparency: 12 / 15.
-- Automation/SBOM maturity: 9 / 15.
+- Automation/SBOM maturity: 12 / 15.
 
-Main remaining improvement: add an automated dependency license report or SBOM generation step before any formal release.
+Main remaining improvement: generate a formal SBOM (for example CycloneDX) before any formal release. A lightweight license scan now exists in `scripts/license_report.sh`, which lists every installed package's license and fails if any package lacks a detectable license.
 
 ## Remediation Priority
 
@@ -75,7 +75,8 @@ Main remaining improvement: add an automated dependency license report or SBOM g
 | P1 | Add package license metadata | Done |
 | P2 | Add third-party notices | Done |
 | P2 | Document model license boundary | Done |
-| P3 | Add automated SBOM or license scan command | Future improvement |
+| P3 | Add automated license scan command | Done (`scripts/license_report.sh`) |
+| P3 | Add formal SBOM (e.g. CycloneDX) generation | Future improvement |
 | P3 | Add contribution or DCO guidance if accepting outside contributions | Future improvement |
 
 ## Future Consequence
