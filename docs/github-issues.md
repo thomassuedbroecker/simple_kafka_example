@@ -285,3 +285,25 @@ Acceptance criteria:
 - Tests and markdown whitespace checks pass.
 
 Traceability: LI-009.
+
+## GH-016: Add optional Kafbat UI to local Kafka learning setup
+
+GitHub issue: https://github.com/thomassuedbroecker/simple_kafka_example/issues/16
+
+Labels: `learning`, `kafka`, `developer-experience`, `documentation`
+
+Body:
+
+Add Kafbat UI as an optional local Kafka web console for the learning project.
+
+Acceptance criteria:
+
+- `docker-compose.yml` starts Kafbat UI alongside the local KRaft Kafka broker.
+- Kafka has a host listener for Python clients and an internal listener for Kafbat UI.
+- `scripts/start.sh` starts the UI with Kafka.
+- README includes Kafbat UI in the run flow as a learning step after producing transactions.
+- README explains what to inspect in the UI: topic, messages, partitions, consumer group, and offsets.
+- Traceability, project status, GitHub issue docs, and third-party notices mention Kafbat UI.
+- Tests and `docker compose config` pass.
+
+Traceability: LI-001, LI-002, LI-003, LI-008, LI-009, LI-011.

@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-docker compose up -d kafka
+docker compose up -d kafka kafbat-ui

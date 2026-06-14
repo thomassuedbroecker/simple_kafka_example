@@ -76,6 +76,7 @@ These components are required to run the full demo, but they are not vendored or
 | Component | Version / Artifact checked | License evidence | Source | Used for | Bundled in this repo? |
 | --- | --- | --- | --- | --- | --- |
 | Apache Kafka container image `apache/kafka` | 3.8.1 from [docker-compose.yml](docker-compose.yml) | Apache Kafka upstream license is Apache-2.0 | <https://github.com/apache/kafka/blob/trunk/LICENSE>, <https://hub.docker.com/r/apache/kafka> | Local one-broker Kafka in KRaft mode | No |
+| Kafbat UI container image `ghcr.io/kafbat/kafka-ui` | `latest` from [docker-compose.yml](docker-compose.yml) | Upstream project license is Apache-2.0 | <https://github.com/kafbat/kafka-ui/blob/main/LICENSE>, <https://ui.docs.kafbat.io/> | Optional local Kafka web UI for topics, messages, groups, and offsets | No |
 | Ollama application | local installation | Upstream Ollama license is MIT | <https://github.com/ollama/ollama/blob/main/LICENSE> | Local model runtime and HTTP API on `localhost:11434` | No |
 
 ## Local Ollama Models
@@ -120,4 +121,4 @@ docker compose config
 ollama list
 ```
 
-4. Update this file whenever [pyproject.toml](pyproject.toml), [docker-compose.yml](docker-compose.yml), or documented Ollama model names change.
+4. Update this file whenever [pyproject.toml](pyproject.toml), [docker-compose.yml](docker-compose.yml), documented container images, or documented Ollama model names change.

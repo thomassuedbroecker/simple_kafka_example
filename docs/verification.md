@@ -43,6 +43,23 @@ Result:
 Created topic: banking.transactions
 ```
 
+Docker Compose configuration with Kafbat UI:
+
+```bash
+docker compose config
+```
+
+Result:
+
+```text
+kafbat-ui:
+  image: ghcr.io/kafbat/kafka-ui:latest
+  ports:
+    - "8080:8080"
+kafka:
+  KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,INTERNAL://kafka:29092
+```
+
 Producer:
 
 ```bash
@@ -107,6 +124,8 @@ SUSPICIOUS
 
 - Rancher Desktop worked as the local container runner.
 - Kafka ran in one local container in KRaft mode.
+- Kafbat UI is configured as an optional local Kafka browser on `http://localhost:8080`.
+- Kafka exposes `localhost:9092` for Python clients and `kafka:29092` for Kafbat UI inside the Docker Compose network.
 - The Kafka topic `banking.transactions` was created.
 - The producer wrote 10 JSON transaction messages using `transaction_id` as the Kafka key.
 - The consumer read and inspected 10 messages.

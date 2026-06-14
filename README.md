@@ -15,6 +15,7 @@ producer -> Kafka topic -> consumer -> rules -> LangGraph -> Ollama -> streamed 
 By the end, you should be able to explain:
 
 - Kafka topic, producer, consumer, message key, message value, consumer group, offset, and JSON payload basics.
+- How Kafbat UI can show the topic, messages, consumer group, and offsets visually.
 - Why deterministic transaction rules run before the LLM explanation.
 - How LangGraph moves inspection state through small workflow nodes.
 - Where Ollama streams local AI output in the terminal.
@@ -61,6 +62,7 @@ SUSPICIOUS
 ```mermaid
 flowchart LR
     A[Demo Transaction Producer] --> B[Kafka Topic: banking.transactions]
+    B --> H[Kafbat UI: optional topic browser]
     B --> C[Kafka Consumer]
     C --> D[Deterministic Rules]
     D --> E[LangGraph Agent]
@@ -82,11 +84,11 @@ source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
-### 2. Start Kafka
+### 2. Start Kafka And Kafbat UI
 
 Start your local container runner first, such as Rancher Desktop, Docker Desktop, or Colima.
 
-What you learn: Kafka runs as a local container in this project, and Docker Compose starts the broker. Official resources: [Docker Compose documentation](https://docs.docker.com/compose/) and [Apache Kafka quickstart](https://kafka.apache.org/quickstart/).
+What you learn: Kafka runs as a local container in this project, Docker Compose starts the broker, and Kafbat UI gives you a visual read-only way to inspect the learning flow. Official resources: [Docker Compose documentation](https://docs.docker.com/compose/), [Apache Kafka quickstart](https://kafka.apache.org/quickstart/), and [Kafbat UI documentation](https://ui.docs.kafbat.io/).
 
 ```bash
 ./scripts/start.sh
@@ -97,6 +99,8 @@ PYTHON=.venv/bin/python ./scripts/create_topics.sh
 Expected result:
 
 ```text
+Container local-kafka-langgraph-banking-ai-kafka Running
+Container local-kafka-langgraph-banking-ai-kafbat-ui Running
 Created topic: banking.transactions
 ```
 
@@ -107,6 +111,14 @@ Topic already exists: banking.transactions
 ```
 
 The Kafka broker runs in KRaft mode, which means there is no ZooKeeper container.
+
+Open Kafbat UI at:
+
+```text
+http://localhost:8080
+```
+
+Expected UI result: a cluster named `local-kafka`.
 
 ### 3. Start Ollama
 
@@ -150,7 +162,32 @@ Sent key=txn-1010 topic=banking.transactions partition=0 offset=9
 Produced 10 demo transactions.
 ```
 
-### 5. Consume And Inspect Transactions
+### 5. Inspect Kafka In Kafbat UI
+
+What you learn: Kafka messages remain in the topic, and a UI can help you connect the terminal commands to Kafka concepts.
+
+Open:
+
+```text
+http://localhost:8080
+```
+
+Look for:
+
+- Cluster: `local-kafka`
+- Topic: `banking.transactions`
+- Messages: JSON transaction payloads
+- Key: `transaction_id`, such as `txn-1001`
+- Partition: `0` in this single-partition learning setup
+
+After running the consumer in the next step, also inspect:
+
+- Consumer group: `banking-ai-inspector`
+- Offsets: the committed position after inspected messages
+
+Kafbat UI is only for learning visibility here. The application still works from the terminal without using the UI.
+
+### 6. Consume And Inspect Transactions
 
 What you learn: a Kafka consumer reads messages as part of a consumer group, the app applies deterministic rules first, LangGraph moves state through the inspection workflow, and Ollama streams explanation text back to the terminal. Official resource: [LangGraph overview](https://docs.langchain.com/oss/python/langgraph/overview).
 
@@ -202,7 +239,7 @@ Run the producer first with: PYTHON=.venv/bin/python ./scripts/produce_demo_tran
 If you already consumed these messages, use a new CONSUMER_GROUP_ID to replay them.
 ```
 
-### 6. Run Tests
+### 7. Run Tests
 
 What you learn: the rule logic, model validation, Kafka config, and graph state behavior can be verified without Kafka, containers, Ollama, or network access. Official resource: [pytest documentation](https://docs.pytest.org/en/stable/).
 
@@ -246,6 +283,7 @@ This project does not define a persistent Kafka volume. After `./scripts/stop.sh
 ### Why These Parts Exist
 
 - Kafka teaches event streaming: a producer writes events into a named topic, and a consumer reads those events later.
+- Kafbat UI helps you see the topic, messages, consumer group, partitions, and offsets while learning.
 - Ollama runs an LLM locally without API keys, cloud services, or external AI APIs.
 - LangGraph makes the inspection flow explicit as small state transitions.
 - Deterministic rules run before the LLM because important decisions should not depend only on generated text.
@@ -259,6 +297,7 @@ This project does not define a persistent Kafka volume. After `./scripts/stop.sh
 - Consumer: `python -m banking_ai.consumer` reads events from the topic.
 - Consumer group: `banking-ai-inspector` lets Kafka coordinate which consumer instance reads which messages.
 - Offset: Kafka tracks each consumer group's position in the topic. This example commits an offset only after a transaction was inspected successfully.
+- Kafbat UI: `http://localhost:8080` shows the local Kafka cluster, topic, messages, consumer group, and offsets.
 
 ### Offsets And Consumer Groups
 
@@ -294,6 +333,13 @@ OLLAMA_MODEL=llama3.2
 CONSUMER_GROUP_ID=banking-ai-inspector
 ```
 
+Kafbat UI is configured in Docker Compose with:
+
+```bash
+KAFKA_CLUSTERS_0_NAME=local-kafka
+KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:29092
+```
+
 Copy `.env.example` if you want a local reference file. The Python code reads environment variables directly.
 
 The Python helper scripts use `${PYTHON:-python3}`. If your virtual environment is not activated, prefix them with `PYTHON=.venv/bin/python`.
@@ -314,6 +360,15 @@ PYTHON=.venv/bin/python ./scripts/create_topics.sh
 ```
 
 Check that your local container runner is running and that port `9092` is free.
+
+Kafbat UI is not reachable:
+
+```bash
+docker compose ps
+docker compose logs kafbat-ui
+```
+
+Check that port `8080` is free and open `http://localhost:8080`.
 
 Ollama is not reachable:
 
