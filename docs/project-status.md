@@ -6,14 +6,15 @@ GitHub repository: `thomassuedbroecker/simple_kafka_example`
 
 ## Current Status
 
-Two issues are open and implemented; both await a local runtime demo before
-closing:
+Open, implemented issues:
 
-- Issue [#25](https://github.com/thomassuedbroecker/simple_kafka_example/issues/25) — local-execution optimization (Rancher Desktop docs, rule `severity`, `verify.sh` / `demo.sh`, ADRs). Implemented in commit `4f628f5`.
-- Issue [#26](https://github.com/thomassuedbroecker/simple_kafka_example/issues/26) — Results UI live Kafka consume mode (consumer group, partition, offset). Implemented in commit `91305f1`.
+- Issue [#25](https://github.com/thomassuedbroecker/simple_kafka_example/issues/25) — local-execution optimization (Rancher Desktop docs, rule `severity`, `verify.sh` / `demo.sh`, ADRs). Implemented in commit `4f628f5`. Awaits a local runtime demo before closing.
+- Issue [#26](https://github.com/thomassuedbroecker/simple_kafka_example/issues/26) — Results UI live Kafka consume mode (consumer group, partition, offset). Implemented in commit `91305f1`. Awaits a local runtime demo before closing.
+- Issue [#27](https://github.com/thomassuedbroecker/simple_kafka_example/issues/27) — licensing re-verification (all 38 installed packages OSI-licensed) and `scripts/license_report.sh`.
 
-Static verification passes (16 tests, `docker compose config`). Runtime
-confirmation with Rancher Desktop and Ollama is still pending for both.
+Static verification passes (16 tests, `docker compose config`, license scan).
+Runtime confirmation with Rancher Desktop and Ollama is still pending for #25
+and #26.
 
 All earlier implementation and documentation issues for the learning example are closed.
 
@@ -27,6 +28,12 @@ Result:
 
 ```json
 [
+  {
+    "number": 27,
+    "title": "Licensing: verify all dependencies are OSI-licensed and add a license-scan script",
+    "state": "OPEN",
+    "url": "https://github.com/thomassuedbroecker/simple_kafka_example/issues/27"
+  },
   {
     "number": 26,
     "title": "Results UI: consume live messages from Kafka (consumer group, partition, offset)",
@@ -71,6 +78,7 @@ Result:
 | [#24 Add demo GIF to README](https://github.com/thomassuedbroecker/simple_kafka_example/issues/24) | Closed | `README.md`, `images/kafbat-ui-1ß.gif`, `docs/github-issues.md`, `docs/project-status.md` | `22583fd` |
 | [#25 Optimize local execution: Rancher Desktop docs, rule severity, verify/demo scripts, ADRs](https://github.com/thomassuedbroecker/simple_kafka_example/issues/25) | Open (implemented; runtime demo pending) | `README.md`, `docs/local-execution.md`, `docs/troubleshooting.md`, `docs/adr/0001-0004`, `src/banking_ai/models.py`, `src/banking_ai/rules.py`, `src/banking_ai/graph.py`, `src/banking_ai/results_ui.py`, `tests/test_rules.py`, `scripts/verify.sh`, `scripts/demo.sh` | `4f628f5` |
 | [#26 Results UI: consume live messages from Kafka (consumer group, partition, offset)](https://github.com/thomassuedbroecker/simple_kafka_example/issues/26) | Open (implemented; runtime demo pending) | `src/banking_ai/results_ui.py`, `tests/test_results_ui.py`, `README.md`, `docs/traceability.md`, `docs/verification.md`, `docs/project-status.md` | `91305f1` |
+| [#27 Licensing: verify all dependencies are OSI-licensed and add a license-scan script](https://github.com/thomassuedbroecker/simple_kafka_example/issues/27) | Open (implemented) | `scripts/license_report.sh`, `THIRD_PARTY_NOTICES.md`, `docs/license-review.md`, `README.md`, `.gitignore` | d6af3d6 |
 
 Issue [#11](https://github.com/thomassuedbroecker/simple_kafka_example/issues/11) is closed as a duplicate of #10.
 
