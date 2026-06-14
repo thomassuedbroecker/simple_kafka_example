@@ -3,6 +3,13 @@
 This UI is intentionally lightweight. Kafbat UI shows the full Kafka cluster;
 this page shows one learning-focused Kafka topic event, the deterministic
 findings, the LangGraph agent steps, and the streamed Ollama explanation.
+
+It has two modes:
+
+- "Consume next from Kafka": read the next live message with a Kafka consumer
+  group (showing partition and offset) and commit the offset after inspection.
+- "Inspect selected (demo replay)": inspect a predefined event from memory,
+  so the UI still works when no broker is running.
 """
 
 from __future__ import annotations
@@ -158,7 +165,7 @@ HTML_PAGE = """<!doctype html>
 <body>
   <header>
     <h1>Banking Topic Event And AI Agent Result</h1>
-    <p>Choose a predefined Kafka event and stream the local LangGraph/Ollama inspection in the browser.</p>
+    <p>Consume the next live Kafka message, or replay a demo event, and stream the local LangGraph/Ollama inspection in the browser.</p>
   </header>
   <main>
     <aside>

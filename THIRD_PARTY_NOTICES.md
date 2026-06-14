@@ -86,7 +86,6 @@ Model files are not included in this repository. Users choose and pull models lo
 | Model reference used in docs/verification | License evidence checked | Source | Repository distribution status | Notes |
 | --- | --- | --- | --- | --- |
 | `qwen3-coder:30b` | Ollama model page exposes an Apache License Version 2.0 license entry | <https://ollama.com/library/qwen3-coder:30b> | Not bundled | Default configured model and local smoke verification model. If you redistribute the model or outputs in another project, check the exact model card/license terms. |
-| `llama3.2` | No license entry was visible in the fetched Ollama library page during this review | <https://ollama.com/library/llama3.2> | Not bundled | Optional alternative model. Users must check the model page and upstream model license before redistribution. |
 | `granite4:350m-h` | Not rechecked during this license pass | local installed model used during earlier verification | Not bundled | Mentioned only as a local verification model. Check its upstream model license before redistribution. |
 
 ## Obligation Notes For This Repository

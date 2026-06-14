@@ -90,20 +90,24 @@ SUSPICIOUS
 flowchart LR
     A[Demo Transaction Producer] --> B[Kafka Topic: banking.transactions]
     B --> H[Kafbat UI: optional topic browser]
-    B --> C[Kafka Consumer: terminal]
+    B --> C[Terminal Kafka Consumer]
+    B --> I[Results UI Kafka Consumer: live mode]
     C --> D[Deterministic Rules]
+    I --> D
     D --> E[LangGraph Agent]
     E --> F[Ollama Local LLM]
     F --> G[Streamed Terminal Explanation]
-    B --> I[Results UI: live consumer or demo replay]
-    I --> D
-    F --> J[Results UI: streamed AI agent result]
+    F --> J[Streamed Results UI Page]
 ```
 
-Both the terminal consumer and the Results UI's "Consume next from Kafka" mode
-read the same topic with a Kafka consumer group and commit offsets. The Results
-UI also offers a demo-replay mode that inspects a predefined event from memory
-without a broker.
+Two consumers read the same topic and feed the same pipeline:
+
+- The **terminal consumer** (`python -m banking_ai.consumer`).
+- The **Results UI** in its "Consume next from Kafka" mode.
+
+Both use a Kafka consumer group and commit the offset only after a successful
+inspection. The Results UI also has a **demo-replay** mode that inspects a
+predefined event from memory, so it still works when no broker is running.
 
 ## Demo GIFs
 
