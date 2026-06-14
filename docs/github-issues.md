@@ -326,3 +326,23 @@ Acceptance criteria:
 - Commit references this issue.
 
 Traceability: documentation/code synchronization.
+
+## GH-018: Document executed test coverage details
+
+GitHub issue: https://github.com/thomassuedbroecker/simple_kafka_example/issues/18
+
+Labels: `documentation`, `testing`
+
+Body:
+
+Add clearer documentation for the tests that were executed during verification.
+
+Acceptance criteria:
+
+- Verification docs list the executed test command and result.
+- Verification docs explain which test files ran and what behavior each file validates.
+- The Tests workflow has two independent gates: Python unit tests and Docker Compose configuration validation.
+- Project status references the test-detail documentation update.
+- Commit references this issue.
+
+Traceability: LI-010 and repository verification evidence.

@@ -253,6 +253,13 @@ Expected result:
 10 passed
 ```
 
+The [Tests workflow](.github/workflows/tests.yml) runs two independent gates:
+
+| Gate | Command | What it proves |
+| --- | --- | --- |
+| Python unit tests | `python -m pytest` | Rules, Pydantic models, LangGraph state flow, fake Ollama streaming, and local Kafka client config work without Docker, Kafka, Ollama, or network access. |
+| Docker Compose configuration | `docker compose config` | The Kafka and Kafbat UI Compose configuration is syntactically valid and renders the intended services, ports, and listener settings. |
+
 ## Clean Up
 
 Stop and remove the local Kafka container and Docker Compose network:
