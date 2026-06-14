@@ -1,8 +1,8 @@
-"""Small local web UI for AI inspection results.
+"""Small local web UI for Kafka topic events and AI inspection results.
 
-This UI is intentionally lightweight. Kafbat UI shows Kafka topics/messages;
-this page shows the deterministic findings and streamed Ollama explanation for
-the same predefined demo transactions used by the producer.
+This UI is intentionally lightweight. Kafbat UI shows the full Kafka cluster;
+this page shows one learning-focused Kafka topic event, the deterministic
+findings, the LangGraph agent steps, and the streamed Ollama explanation.
 """
 
 from __future__ import annotations
@@ -11,8 +11,6 @@ from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 from urllib.parse import parse_qs, urlparse
-
-from pydantic import ValidationError
 
 from banking_ai.config import load_settings
 from banking_ai.graph import inspect_with_graph
@@ -105,6 +103,33 @@ HTML_PAGE = """<!doctype html>
     .normal { color: var(--ok); background: #dcfce7; }
     .suspicious { color: var(--danger); background: #fee2e2; }
     ul { padding-left: 20px; }
+    .event {
+      margin-top: 16px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #f9fafb;
+    }
+    .event h2 { margin: 0 0 10px; font-size: 18px; }
+    .event pre { min-height: 180px; margin-bottom: 0; }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 0;
+      color: var(--muted);
+      font-weight: 650;
+    }
+    .step::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 2px solid var(--line);
+      background: #fff;
+    }
+    .step.done { color: var(--ok); }
+    .step.done::before { border-color: var(--ok); background: var(--ok); }
     pre {
       white-space: pre-wrap;
       word-break: break-word;
@@ -124,19 +149,32 @@ HTML_PAGE = """<!doctype html>
 </head>
 <body>
   <header>
-    <h1>Banking AI Inspection Results</h1>
-    <p>Choose a predefined transaction and stream the local Ollama explanation in the browser.</p>
+    <h1>Banking Topic Event And AI Agent Result</h1>
+    <p>Choose a predefined Kafka event and stream the local LangGraph/Ollama inspection in the browser.</p>
   </header>
   <main>
     <aside>
-      <label for="transaction">Demo transaction</label>
+      <label for="transaction">Kafka topic event</label>
       <select id="transaction"></select>
       <button id="inspect">Inspect with local AI</button>
       <div id="transaction-details"></div>
-      <p class="hint">Kafka messages are visible in Kafbat UI. This page focuses on the inspection result and streamed AI text.</p>
+      <div class="event">
+        <h2>Topic event</h2>
+        <dl id="event-meta"></dl>
+        <h3>Message value</h3>
+        <pre id="event-value"></pre>
+      </div>
+      <p class="hint">Kafbat UI shows the Kafka cluster. This page shows the selected topic event and the AI agent result.</p>
     </aside>
     <section>
-      <h2>Inspection</h2>
+      <h2>AI agent</h2>
+      <div id="agent-steps">
+        <div class="step" data-step="load_transaction">load_transaction</div>
+        <div class="step" data-step="apply_rules">apply_rules</div>
+        <div class="step" data-step="generate_ai_explanation">generate_ai_explanation</div>
+        <div class="step" data-step="finalize_result">finalize_result</div>
+      </div>
+      <h2>Inspection result</h2>
       <div id="status"></div>
       <h3>Rule findings</h3>
       <ul id="findings"></ul>
@@ -150,14 +188,18 @@ HTML_PAGE = """<!doctype html>
     const select = document.querySelector("#transaction");
     const button = document.querySelector("#inspect");
     const details = document.querySelector("#transaction-details");
+    const eventMeta = document.querySelector("#event-meta");
+    const eventValue = document.querySelector("#event-value");
     const findings = document.querySelector("#findings");
     const status = document.querySelector("#status");
     const aiOutput = document.querySelector("#ai-output");
     const reviewerCheck = document.querySelector("#reviewer-check");
-    let transactions = [];
+    const steps = document.querySelectorAll(".step");
+    let events = [];
     let source = null;
 
-    function renderTransaction(tx) {
+    function renderEvent(topicEvent) {
+      const tx = topicEvent.value;
       details.innerHTML = `
         <dl>
           <dt>Account</dt><dd>${tx.account_id}</dd>
@@ -167,6 +209,20 @@ HTML_PAGE = """<!doctype html>
           <dt>Type</dt><dd>${tx.transaction_type}</dd>
         </dl>
       `;
+      eventMeta.innerHTML = `
+        <dt>Topic</dt><dd>${topicEvent.topic}</dd>
+        <dt>Key</dt><dd>${topicEvent.key}</dd>
+      `;
+      eventValue.textContent = JSON.stringify(topicEvent.value, null, 2);
+    }
+
+    function resetSteps() {
+      for (const step of steps) step.classList.remove("done");
+    }
+
+    function markStep(name) {
+      const step = document.querySelector(`[data-step="${name}"]`);
+      if (step) step.classList.add("done");
     }
 
     function renderFindings(items) {
@@ -184,19 +240,19 @@ HTML_PAGE = """<!doctype html>
 
     async function loadTransactions() {
       const response = await fetch("/api/transactions");
-      transactions = await response.json();
-      for (const tx of transactions) {
+      events = await response.json();
+      for (const topicEvent of events) {
         const option = document.createElement("option");
-        option.value = tx.transaction_id;
-        option.textContent = `${tx.transaction_id} - ${tx.merchant} - ${tx.amount} ${tx.currency}`;
+        option.value = topicEvent.key;
+        option.textContent = `${topicEvent.topic} | ${topicEvent.key} | ${topicEvent.value.merchant}`;
         select.appendChild(option);
       }
-      renderTransaction(transactions[0]);
+      renderEvent(events[0]);
     }
 
     select.addEventListener("change", () => {
-      const tx = transactions.find((item) => item.transaction_id === select.value);
-      renderTransaction(tx);
+      const topicEvent = events.find((item) => item.key === select.value);
+      renderEvent(topicEvent);
     });
 
     button.addEventListener("click", () => {
@@ -206,8 +262,15 @@ HTML_PAGE = """<!doctype html>
       findings.innerHTML = "";
       aiOutput.textContent = "";
       reviewerCheck.textContent = "";
+      resetSteps();
 
       source = new EventSource(`/api/inspect?transaction_id=${encodeURIComponent(select.value)}`);
+      source.addEventListener("kafka-event", (event) => {
+        renderEvent(JSON.parse(event.data));
+      });
+      source.addEventListener("agent-step", (event) => {
+        markStep(JSON.parse(event.data).step);
+      });
       source.addEventListener("rules", (event) => {
         const data = JSON.parse(event.data);
         status.innerHTML = `<span class="status ${data.suspicious ? "suspicious" : "normal"}">${data.suspicious ? "SUSPICIOUS" : "NORMAL"}</span>`;
@@ -265,7 +328,8 @@ class ResultsUiHandler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def _send_transactions(self) -> None:
-        body = json.dumps(DEMO_TRANSACTIONS).encode("utf-8")
+        settings = load_settings()
+        body = json.dumps(_demo_topic_events(settings.transaction_topic)).encode("utf-8")
         self.send_response(HTTPStatus.OK)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
@@ -279,14 +343,20 @@ class ResultsUiHandler(BaseHTTPRequestHandler):
             self.send_error(HTTPStatus.NOT_FOUND, str(exc))
             return
 
+        settings = load_settings()
         self.send_response(HTTPStatus.OK)
         self.send_header("Content-Type", "text/event-stream")
         self.send_header("Cache-Control", "no-cache")
         self.end_headers()
 
-        settings = load_settings()
         client = OllamaClient(settings.ollama_base_url, settings.ollama_model)
+        self._send_event(
+            "kafka-event",
+            _topic_event(transaction, settings.transaction_topic),
+        )
+        self._send_event("agent-step", {"step": "load_transaction"})
         findings = inspect_transaction_rules(transaction)
+        self._send_event("agent-step", {"step": "apply_rules"})
         self._send_event(
             "rules",
             {
@@ -296,6 +366,7 @@ class ResultsUiHandler(BaseHTTPRequestHandler):
         )
 
         try:
+            self._send_event("agent-step", {"step": "generate_ai_explanation"})
             result = inspect_with_graph(
                 transaction,
                 ollama_client=client,
@@ -305,6 +376,7 @@ class ResultsUiHandler(BaseHTTPRequestHandler):
             self._send_event("error-message", f"Ollama error: {exc}")
             return
 
+        self._send_event("agent-step", {"step": "finalize_result"})
         self._send_event(
             "final",
             {
@@ -325,6 +397,23 @@ def _find_transaction(transaction_id: str) -> BankingTransaction:
         if item["transaction_id"] == transaction_id:
             return BankingTransaction.model_validate(item)
     raise ValueError(f"Unknown transaction_id: {transaction_id}")
+
+
+def _topic_event(transaction: BankingTransaction, topic: str) -> dict:
+    """Represent the selected transaction as the Kafka event learners produced."""
+
+    return {
+        "topic": topic,
+        "key": transaction.transaction_id,
+        "value": transaction.model_dump(mode="json"),
+    }
+
+
+def _demo_topic_events(topic: str) -> list[dict]:
+    return [
+        _topic_event(BankingTransaction.model_validate(item), topic)
+        for item in DEMO_TRANSACTIONS
+    ]
 
 
 def run(host: str = "127.0.0.1", port: int = 8081) -> None:

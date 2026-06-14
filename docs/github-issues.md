@@ -432,3 +432,25 @@ Acceptance criteria:
 - Commit references this issue.
 
 Traceability: local AI streaming visibility and beginner learning workflow.
+
+## GH-023: Show Kafka topic event and AI agent flow in Results UI
+
+GitHub issue: https://github.com/thomassuedbroecker/simple_kafka_example/issues/23
+
+Labels: `developer-experience`, `documentation`
+
+Body:
+
+The Results UI should make the learning objective visible in one web app: the selected Kafka topic event and the AI inspection agent flow.
+
+Acceptance criteria:
+
+- Results UI shows the Kafka topic name, message key, and JSON message value for the selected transaction.
+- Results UI shows the AI agent/LangGraph workflow steps alongside the streamed AI explanation.
+- UI keeps deterministic rule findings, final status, and reviewer check visible.
+- README explains that the web app shows the topic event and AI agent result, while Kafbat UI remains the Kafka browser.
+- Traceability, verification, project status, and GitHub issue docs are updated.
+- Tests cover the UI event representation without requiring Kafka, Ollama, Docker, or network access.
+- Commit references this issue.
+
+Traceability: topic-event visibility, local AI streaming visibility, and beginner learning workflow.

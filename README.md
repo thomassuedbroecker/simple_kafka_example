@@ -2,7 +2,7 @@
 
 [![Tests](https://github.com/thomassuedbroecker/simple_kafka_example/actions/workflows/tests.yml/badge.svg)](https://github.com/thomassuedbroecker/simple_kafka_example/actions/workflows/tests.yml)
 
-This is a small local-first learning project for macOS on Apple Silicon. It shows how a Python producer writes fake banking transactions into Kafka, how a consumer reads them back, how deterministic inspection rules run first, and how a small LangGraph workflow streams a local Ollama explanation to the terminal.
+This is a small local-first learning project for macOS on Apple Silicon. It shows how a Python producer writes fake banking transactions into Kafka, how a consumer reads them back, how deterministic inspection rules run first, and how a small LangGraph workflow streams a local Ollama explanation to the terminal and the local Results UI.
 
 This project is for learning. It is not a production banking system, fraud engine, security reference architecture, or scalable Kafka deployment.
 
@@ -18,10 +18,10 @@ By the end, you should be able to explain:
 
 - Kafka topic, producer, consumer, message key, message value, consumer group, offset, and JSON payload basics.
 - How Kafbat UI can show the topic, messages, consumer group, and offsets visually.
-- How the local Results UI shows deterministic findings and streamed AI explanation text.
+- How the local Results UI shows the selected Kafka topic event, deterministic findings, AI agent steps, and streamed AI explanation text.
 - Why deterministic transaction rules run before the LLM explanation.
 - How LangGraph moves inspection state through small workflow nodes.
-- Where Ollama streams local AI output in the terminal.
+- Where Ollama streams local AI output in the terminal and browser.
 - Why this project does not need external AI APIs, cloud services, or API keys.
 
 ## Expected Result
@@ -71,7 +71,7 @@ flowchart LR
     D --> E[LangGraph Agent]
     E --> F[Ollama Local LLM]
     F --> G[Streamed Terminal Explanation]
-    F --> I[Results UI: streamed AI inspection]
+    F --> I[Results UI: topic event and AI agent result]
 ```
 
 ## Run The Example
@@ -245,7 +245,7 @@ If you already consumed these messages, use a new CONSUMER_GROUP_ID to replay th
 
 ### 7. Open The Results UI
 
-What you learn: Kafbat UI shows Kafka internals, while this small project UI shows the inspection result: transaction details, deterministic rule findings, final status, reviewer check, and streamed Ollama explanation.
+What you learn: Kafbat UI shows Kafka internals, while this small project UI shows the selected Kafka topic event and the AI agent result in one browser page.
 
 Start the local results UI:
 
@@ -268,16 +268,18 @@ Press Ctrl+C to stop.
 
 In the browser:
 
-- Select a predefined transaction.
+- Select a predefined Kafka topic event.
 - Click `Inspect with local AI`.
+- See the topic name, message key, and JSON message value.
+- See the AI agent workflow steps: `load_transaction`, `apply_rules`, `generate_ai_explanation`, and `finalize_result`.
 - Watch the AI explanation stream into the page.
 - Compare normal and suspicious transactions.
 
-This UI reuses the same deterministic rules, LangGraph workflow, and Ollama client as the terminal consumer. It does not replace Kafka or Kafbat UI; it focuses on the final inspection result.
+This UI reuses the same deterministic rules, LangGraph workflow, and Ollama client as the terminal consumer. It does not replace Kafka or Kafbat UI; it focuses on connecting one topic event to the AI agent inspection result.
 
 ### 8. Run Tests
 
-What you learn: the rule logic, model validation, Kafka config, Results UI helpers, and graph state behavior can be verified without Kafka, containers, Ollama, or network access. Official resource: [pytest documentation](https://docs.pytest.org/en/stable/).
+What you learn: the rule logic, model validation, Kafka config, Results UI event helpers, and graph state behavior can be verified without Kafka, containers, Ollama, or network access. Official resource: [pytest documentation](https://docs.pytest.org/en/stable/).
 
 ```bash
 .venv/bin/python -m pytest
@@ -286,14 +288,14 @@ What you learn: the rule logic, model validation, Kafka config, Results UI helpe
 Expected result:
 
 ```text
-12 passed
+14 passed
 ```
 
 The [Tests workflow](.github/workflows/tests.yml) runs two independent gates:
 
 | Gate | Command | What it proves |
 | --- | --- | --- |
-| Python unit tests | `python -m pytest` | Rules, Pydantic models, LangGraph state flow, fake Ollama streaming, local Kafka client config, and Results UI helpers work without Docker, Kafka, Ollama, or network access. |
+| Python unit tests | `python -m pytest` | Rules, Pydantic models, LangGraph state flow, fake Ollama streaming, local Kafka client config, and Results UI topic-event helpers work without Docker, Kafka, Ollama, or network access. |
 | Docker Compose configuration | `docker compose config` | The Kafka and Kafbat UI Compose configuration is syntactically valid and renders the intended services, ports, and listener settings. |
 
 ## Clean Up
@@ -327,7 +329,7 @@ This project does not define a persistent Kafka volume. After `./scripts/stop.sh
 
 - Kafka teaches event streaming: a producer writes events into a named topic, and a consumer reads those events later.
 - Kafbat UI helps you see the topic, messages, consumer group, partitions, and offsets while learning.
-- Results UI helps you inspect the final rule and AI output in a browser.
+- Results UI helps you inspect the selected topic event, AI agent steps, final rule output, and AI output in a browser.
 - Ollama runs an LLM locally without API keys, cloud services, or external AI APIs.
 - LangGraph makes the inspection flow explicit as small state transitions.
 - Deterministic rules run before the LLM because important decisions should not depend only on generated text.
@@ -342,7 +344,7 @@ This project does not define a persistent Kafka volume. After `./scripts/stop.sh
 - Consumer group: `banking-ai-inspector` lets Kafka coordinate which consumer instance reads which messages.
 - Offset: Kafka tracks each consumer group's position in the topic. This example commits an offset only after a transaction was inspected successfully.
 - Kafbat UI: `http://localhost:8080` shows the local Kafka cluster, topic, messages, consumer group, and offsets.
-- Results UI: `http://127.0.0.1:8081` shows transaction details, rule findings, final status, reviewer check, and streamed AI explanation.
+- Results UI: `http://127.0.0.1:8081` shows the selected topic event, message key, JSON value, AI agent steps, rule findings, final status, reviewer check, and streamed AI explanation.
 
 ### Offsets And Consumer Groups
 
@@ -389,7 +391,7 @@ Copy `.env.example` if you want a local reference file. The Python code reads en
 
 The Python helper scripts use `${PYTHON:-python3}`. If your virtual environment is not activated, prefix them with `PYTHON=.venv/bin/python`.
 
-The Results UI is a local Python process started with `scripts/start_results_ui.sh`; it is not a container and does not call external AI APIs.
+The Results UI is a local Python process started with `scripts/start_results_ui.sh`; it is not a container and does not call external AI APIs. It renders the selected demo transaction as the Kafka topic event that the producer sends: topic `banking.transactions`, key `transaction_id`, and JSON message value.
 
 ## Documentation And Traceability
 

@@ -29,7 +29,7 @@ Python unit tests:
 Result:
 
 ```text
-12 passed
+14 passed
 ```
 
 Executed test details:
@@ -40,13 +40,13 @@ Executed test details:
 | `tests/test_graph_state.py` | `test_graph_creates_final_result_without_network`, `test_prompt_tells_model_triggered_rules_are_triggered` | LangGraph creates a final inspection result, streams fake Ollama chunks, preserves triggered rule findings, and prompts the model consistently. | None |
 | `tests/test_models.py` | `test_transaction_model_accepts_valid_transaction`, `test_transaction_model_rejects_negative_amount` | Pydantic validates valid banking transactions and rejects invalid negative amounts. | None |
 | `tests/test_rules.py` | `test_normal_transaction_has_no_findings`, `test_large_amount_is_suspicious`, `test_foreign_country_is_suspicious`, `test_large_cash_withdrawal_is_suspicious`, `test_suspicious_merchant_keyword_is_suspicious` | Deterministic rules correctly classify normal transactions and each suspicious rule trigger. | None |
-| `tests/test_results_ui.py` | `test_results_ui_finds_demo_transaction`, `test_results_ui_rejects_unknown_transaction` | Results UI helper finds predefined demo transactions and rejects unknown ids without starting the web server. | None |
+| `tests/test_results_ui.py` | `test_results_ui_finds_demo_transaction`, `test_results_ui_rejects_unknown_transaction`, `test_results_ui_builds_kafka_topic_event`, `test_results_ui_builds_all_demo_topic_events` | Results UI helper finds predefined demo transactions, rejects unknown ids, and renders demo transactions as Kafka topic events with topic, key, and JSON value without starting the web server. | None |
 
 The [Tests workflow](../.github/workflows/tests.yml) runs two independent gates:
 
 | Gate | Command | Purpose |
 | --- | --- | --- |
-| Python unit tests | `python -m pytest` | Runs the 12 infrastructure-free tests listed above. |
+| Python unit tests | `python -m pytest` | Runs the 14 infrastructure-free tests listed above. |
 | Docker Compose configuration | `docker compose config` | Validates the Kafka plus Kafbat UI Compose file without starting the containers. |
 
 Kafka startup with Rancher Desktop:
@@ -104,7 +104,7 @@ Result:
 ```text
 Results UI: http://127.0.0.1:8081
 HTML page returned
-10 demo transactions returned as JSON
+10 demo Kafka topic events returned as JSON
 ```
 
 Producer:
@@ -183,4 +183,5 @@ SUSPICIOUS
 - The default README and code model is `qwen3-coder:30b`, matching the local smoke verification model.
 - The scripts now support `PYTHON=.venv/bin/python` and default to `python3` when `PYTHON` is not set, which is more reliable on macOS systems without a `python` executable.
 - The consumer script now applies a demo idle timeout through `IDLE_TIMEOUT_SECONDS` and prints a clear producer/replay hint if no messages arrive.
-- The Results UI reuses the same rules, LangGraph workflow, and Ollama client as the terminal consumer.
+- The Results UI shows the selected Kafka topic event with topic, key, and JSON value.
+- The Results UI shows the AI agent workflow steps and reuses the same rules, LangGraph workflow, and Ollama client as the terminal consumer.
