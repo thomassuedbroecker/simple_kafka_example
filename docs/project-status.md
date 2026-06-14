@@ -6,7 +6,9 @@ GitHub repository: `thomassuedbroecker/simple_kafka_example`
 
 ## Current Status
 
-All planned implementation and documentation issues for the learning example are closed.
+Issue [#25](https://github.com/thomassuedbroecker/simple_kafka_example/issues/25) is open and tracks the local-execution optimization (Rancher Desktop docs, rule `severity`, `verify.sh` / `demo.sh`, ADRs). It is implemented in commit `4f628f5`; static verification passes (15 tests, `docker compose config`). Runtime demo confirmation with Rancher Desktop and Ollama is still pending.
+
+All earlier implementation and documentation issues for the learning example are closed.
 
 Open issue check:
 
@@ -17,7 +19,14 @@ gh issue list --state open --limit 50 --json number,title,state,url
 Result:
 
 ```json
-[]
+[
+  {
+    "number": 25,
+    "title": "Optimize local execution: Rancher Desktop docs, rule severity, verify/demo scripts, ADRs",
+    "state": "OPEN",
+    "url": "https://github.com/thomassuedbroecker/simple_kafka_example/issues/25"
+  }
+]
 ```
 
 ## Issue Completion Map
@@ -47,6 +56,7 @@ Result:
 | [#22 Add local results UI for AI inspection output](https://github.com/thomassuedbroecker/simple_kafka_example/issues/22) | Closed | `src/banking_ai/results_ui.py`, `scripts/start_results_ui.sh`, `tests/test_results_ui.py`, `README.md`, `docs/traceability.md`, `docs/verification.md`, `docs/project-status.md` | `7dc3ea2`, `4942594` |
 | [#23 Show Kafka topic event and AI agent flow in Results UI](https://github.com/thomassuedbroecker/simple_kafka_example/issues/23) | Closed | `src/banking_ai/results_ui.py`, `tests/test_results_ui.py`, `README.md`, `docs/traceability.md`, `docs/verification.md`, `docs/github-issues.md` | `b75bdae`, `22583fd` |
 | [#24 Add demo GIF to README](https://github.com/thomassuedbroecker/simple_kafka_example/issues/24) | Closed | `README.md`, `images/kafbat-ui-1ß.gif`, `docs/github-issues.md`, `docs/project-status.md` | `22583fd` |
+| [#25 Optimize local execution: Rancher Desktop docs, rule severity, verify/demo scripts, ADRs](https://github.com/thomassuedbroecker/simple_kafka_example/issues/25) | Open (implemented; runtime demo pending) | `README.md`, `docs/local-execution.md`, `docs/troubleshooting.md`, `docs/adr/0001-0004`, `src/banking_ai/models.py`, `src/banking_ai/rules.py`, `src/banking_ai/graph.py`, `src/banking_ai/results_ui.py`, `tests/test_rules.py`, `scripts/verify.sh`, `scripts/demo.sh` | `4f628f5` |
 
 Issue [#11](https://github.com/thomassuedbroecker/simple_kafka_example/issues/11) is closed as a duplicate of #10.
 
@@ -61,7 +71,7 @@ Latest local verification:
 Result:
 
 ```text
-14 passed
+15 passed
 ```
 
 Runtime verification with Rancher Desktop and Ollama is recorded in [docs/verification.md](verification.md).
