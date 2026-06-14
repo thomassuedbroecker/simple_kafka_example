@@ -90,13 +90,20 @@ SUSPICIOUS
 flowchart LR
     A[Demo Transaction Producer] --> B[Kafka Topic: banking.transactions]
     B --> H[Kafbat UI: optional topic browser]
-    B --> C[Kafka Consumer]
+    B --> C[Kafka Consumer: terminal]
     C --> D[Deterministic Rules]
     D --> E[LangGraph Agent]
     E --> F[Ollama Local LLM]
     F --> G[Streamed Terminal Explanation]
-    F --> I[Results UI: topic event and AI agent result]
+    B --> I[Results UI: live consumer or demo replay]
+    I --> D
+    F --> J[Results UI: streamed AI agent result]
 ```
+
+Both the terminal consumer and the Results UI's "Consume next from Kafka" mode
+read the same topic with a Kafka consumer group and commit offsets. The Results
+UI also offers a demo-replay mode that inspects a predefined event from memory
+without a broker.
 
 ## Demo GIFs
 
@@ -352,14 +359,26 @@ Results UI: http://127.0.0.1:8081
 Press Ctrl+C to stop.
 ```
 
-In the browser:
+The UI has two modes:
 
-- Select a predefined Kafka topic event.
-- Click `Inspect with local AI`.
-- See the topic name, message key, and JSON message value.
-- See the AI agent workflow steps: `load_transaction`, `apply_rules`, `generate_ai_explanation`, and `finalize_result`.
-- Watch the AI explanation stream into the page.
-- Compare normal and suspicious transactions.
+- **Consume next from Kafka** (needs the broker running and produced messages):
+  reads the next live message from `banking.transactions` using the consumer
+  group `banking-ai-inspector`, shows the partition and offset, inspects it, and
+  commits the offset only after a successful inspection. Click it again to read
+  the next message and watch the offset advance. To replay, change
+  `CONSUMER_GROUP_ID` before starting the UI.
+- **Inspect selected (demo replay)**: inspects the event chosen in the dropdown
+  from memory, without a broker. Useful when Kafka is not running.
+
+In both modes you see:
+
+- The topic name, message key, and JSON message value (plus group, partition,
+  and offset in live consume mode).
+- The AI agent workflow steps. Live consume shows `consume_from_kafka` first,
+  then `load_transaction`, `apply_rules`, `generate_ai_explanation`, and
+  `finalize_result`. Demo replay skips `consume_from_kafka`.
+- The AI explanation streaming into the page.
+- The difference between normal and suspicious transactions.
 
 This UI reuses the same deterministic rules, LangGraph workflow, and Ollama client as the terminal consumer. It does not replace Kafka or Kafbat UI; it focuses on connecting one topic event to the AI agent inspection result.
 
@@ -374,7 +393,7 @@ What you learn: the rule logic, model validation, Kafka config, Results UI event
 Expected result:
 
 ```text
-15 passed
+16 passed
 ```
 
 The [Tests workflow](.github/workflows/tests.yml) runs two independent gates:
@@ -430,7 +449,7 @@ This project does not define a persistent Kafka volume. After `./scripts/stop.sh
 - Consumer group: `banking-ai-inspector` lets Kafka coordinate which consumer instance reads which messages.
 - Offset: Kafka tracks each consumer group's position in the topic. This example commits an offset only after a transaction was inspected successfully.
 - Kafbat UI: `http://localhost:8080` shows the local Kafka cluster, topic, messages, consumer group, and offsets.
-- Results UI: `http://127.0.0.1:8081` shows the selected topic event, message key, JSON value, AI agent steps, rule findings, final status, reviewer check, and streamed AI explanation.
+- Results UI: `http://127.0.0.1:8081` can consume the next live message with a Kafka consumer group (showing partition and offset) or replay a predefined demo event, then shows the AI agent steps, rule findings, final status, reviewer check, and streamed AI explanation.
 
 ### Offsets And Consumer Groups
 

@@ -10,14 +10,22 @@ from __future__ import annotations
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
+import time
 from urllib.parse import parse_qs, urlparse
 
-from banking_ai.config import load_settings
+from confluent_kafka import Consumer, KafkaException
+from pydantic import ValidationError
+
+from banking_ai.config import kafka_base_config, load_settings
 from banking_ai.graph import inspect_with_graph
 from banking_ai.models import BankingTransaction
 from banking_ai.ollama_client import OllamaClient, OllamaError
 from banking_ai.producer import DEMO_TRANSACTIONS
 from banking_ai.rules import inspect_transaction_rules
+
+# How long the Results UI waits for the next live Kafka message before telling
+# the learner to produce transactions or change the consumer group.
+CONSUME_IDLE_TIMEOUT_SECONDS = 10.0
 
 
 HTML_PAGE = """<!doctype html>
@@ -156,7 +164,9 @@ HTML_PAGE = """<!doctype html>
     <aside>
       <label for="transaction">Kafka topic event</label>
       <select id="transaction"></select>
-      <button id="inspect">Inspect with local AI</button>
+      <button id="consume">Consume next from Kafka</button>
+      <button id="inspect">Inspect selected (demo replay)</button>
+      <p class="hint" id="mode-hint">Consume reads the next live message from the topic via a Kafka consumer group and advances the offset. Demo replay inspects the selected event from memory without Kafka.</p>
       <div id="transaction-details"></div>
       <div class="event">
         <h2>Topic event</h2>
@@ -169,6 +179,7 @@ HTML_PAGE = """<!doctype html>
     <section>
       <h2>AI agent</h2>
       <div id="agent-steps">
+        <div class="step" data-step="consume_from_kafka">consume_from_kafka</div>
         <div class="step" data-step="load_transaction">load_transaction</div>
         <div class="step" data-step="apply_rules">apply_rules</div>
         <div class="step" data-step="generate_ai_explanation">generate_ai_explanation</div>
@@ -187,6 +198,7 @@ HTML_PAGE = """<!doctype html>
   <script>
     const select = document.querySelector("#transaction");
     const button = document.querySelector("#inspect");
+    const consumeButton = document.querySelector("#consume");
     const details = document.querySelector("#transaction-details");
     const eventMeta = document.querySelector("#event-meta");
     const eventValue = document.querySelector("#event-value");
@@ -209,10 +221,14 @@ HTML_PAGE = """<!doctype html>
           <dt>Type</dt><dd>${tx.transaction_type}</dd>
         </dl>
       `;
-      eventMeta.innerHTML = `
+      let meta = `
         <dt>Topic</dt><dd>${topicEvent.topic}</dd>
         <dt>Key</dt><dd>${topicEvent.key}</dd>
       `;
+      if (topicEvent.group !== undefined) meta += `<dt>Group</dt><dd>${topicEvent.group}</dd>`;
+      if (topicEvent.partition !== undefined) meta += `<dt>Partition</dt><dd>${topicEvent.partition}</dd>`;
+      if (topicEvent.offset !== undefined) meta += `<dt>Offset</dt><dd>${topicEvent.offset}</dd>`;
+      eventMeta.innerHTML = meta;
       eventValue.textContent = JSON.stringify(topicEvent.value, null, 2);
     }
 
@@ -256,16 +272,22 @@ HTML_PAGE = """<!doctype html>
       renderEvent(topicEvent);
     });
 
-    button.addEventListener("click", () => {
+    function runInspection(url) {
       if (source) source.close();
       button.disabled = true;
+      consumeButton.disabled = true;
       status.innerHTML = "";
       findings.innerHTML = "";
       aiOutput.textContent = "";
       reviewerCheck.textContent = "";
       resetSteps();
 
-      source = new EventSource(`/api/inspect?transaction_id=${encodeURIComponent(select.value)}`);
+      const done = () => {
+        button.disabled = false;
+        consumeButton.disabled = false;
+      };
+
+      source = new EventSource(url);
       source.addEventListener("kafka-event", (event) => {
         renderEvent(JSON.parse(event.data));
       });
@@ -283,17 +305,25 @@ HTML_PAGE = """<!doctype html>
       source.addEventListener("final", (event) => {
         const data = JSON.parse(event.data);
         reviewerCheck.textContent = data.reviewer_check;
-        button.disabled = false;
+        done();
         source.close();
       });
       source.addEventListener("error-message", (event) => {
         aiOutput.textContent += `\\n${JSON.parse(event.data)}`;
-        button.disabled = false;
+        done();
         source.close();
       });
       source.onerror = () => {
-        button.disabled = false;
+        done();
       };
+    }
+
+    button.addEventListener("click", () => {
+      runInspection(`/api/inspect?transaction_id=${encodeURIComponent(select.value)}`);
+    });
+
+    consumeButton.addEventListener("click", () => {
+      runInspection("/api/consume");
     });
 
     loadTransactions();
@@ -314,6 +344,9 @@ class ResultsUiHandler(BaseHTTPRequestHandler):
             return
         if parsed.path == "/api/inspect":
             self._stream_inspection(parse_qs(parsed.query).get("transaction_id", [""])[0])
+            return
+        if parsed.path == "/api/consume":
+            self._stream_consume()
             return
         self.send_error(HTTPStatus.NOT_FOUND, "Not found")
 
@@ -337,7 +370,14 @@ class ResultsUiHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _begin_event_stream(self) -> None:
+        self.send_response(HTTPStatus.OK)
+        self.send_header("Content-Type", "text/event-stream")
+        self.send_header("Cache-Control", "no-cache")
+        self.end_headers()
+
     def _stream_inspection(self, transaction_id: str) -> None:
+        """Demo replay: inspect a predefined event from memory, without Kafka."""
         try:
             transaction = _find_transaction(transaction_id)
         except ValueError as exc:
@@ -345,16 +385,83 @@ class ResultsUiHandler(BaseHTTPRequestHandler):
             return
 
         settings = load_settings()
-        self.send_response(HTTPStatus.OK)
-        self.send_header("Content-Type", "text/event-stream")
-        self.send_header("Cache-Control", "no-cache")
-        self.end_headers()
+        self._begin_event_stream()
+        kafka_event = _topic_event(transaction, settings.transaction_topic)
+        self._run_graph_inspection(transaction, kafka_event, settings)
 
-        client = OllamaClient(settings.ollama_base_url, settings.ollama_model)
-        self._send_event(
-            "kafka-event",
-            _topic_event(transaction, settings.transaction_topic),
+    def _stream_consume(self) -> None:
+        """Read the next live message from Kafka via a consumer group, then inspect.
+
+        This mirrors the terminal consumer: it uses the configured consumer
+        group, commits the offset only after a successful inspection, and shows
+        the partition and offset so the consumer concept is visible in the UI.
+        """
+        settings = load_settings()
+        config = kafka_base_config(settings)
+        config.update(
+            {
+                "group.id": settings.consumer_group_id,
+                "auto.offset.reset": "earliest",
+                "enable.auto.commit": False,
+            }
         )
+
+        self._begin_event_stream()
+        self._send_event("agent-step", {"step": "consume_from_kafka"})
+
+        try:
+            consumer = Consumer(config)
+        except KafkaException as exc:
+            self._send_event("error-message", f"Could not create Kafka consumer: {exc}")
+            return
+
+        consumer.subscribe([settings.transaction_topic])
+        try:
+            message = self._poll_next(consumer)
+            if message is None:
+                self._send_event(
+                    "error-message",
+                    f"No Kafka messages arrived within {CONSUME_IDLE_TIMEOUT_SECONDS:g} "
+                    "seconds. Produce demo transactions first, or change "
+                    "CONSUMER_GROUP_ID to replay already-consumed messages.",
+                )
+                return
+
+            try:
+                payload = json.loads(message.value().decode("utf-8"))
+                transaction = BankingTransaction.model_validate(payload)
+            except (json.JSONDecodeError, ValidationError) as exc:
+                consumer.commit(message=message, asynchronous=False)
+                self._send_event(
+                    "error-message",
+                    f"Skipping invalid message at offset {message.offset()}: {exc}",
+                )
+                return
+
+            kafka_event = _kafka_event_from_message(message, settings.consumer_group_id)
+            if self._run_graph_inspection(transaction, kafka_event, settings):
+                consumer.commit(message=message, asynchronous=False)
+        except KafkaException as exc:
+            self._send_event("error-message", f"Kafka error: {exc}")
+        finally:
+            consumer.close()
+
+    def _poll_next(self, consumer: Consumer):
+        """Poll until a message arrives or the idle timeout is reached."""
+        deadline = time.monotonic() + CONSUME_IDLE_TIMEOUT_SECONDS
+        while time.monotonic() < deadline:
+            message = consumer.poll(1.0)
+            if message is None:
+                continue
+            if message.error():
+                raise KafkaException(message.error())
+            return message
+        return None
+
+    def _run_graph_inspection(self, transaction, kafka_event, settings) -> bool:
+        """Emit the shared rules -> LangGraph -> Ollama flow. True on success."""
+        client = OllamaClient(settings.ollama_base_url, settings.ollama_model)
+        self._send_event("kafka-event", kafka_event)
         self._send_event("agent-step", {"step": "load_transaction"})
         findings = inspect_transaction_rules(transaction)
         self._send_event("agent-step", {"step": "apply_rules"})
@@ -375,7 +482,7 @@ class ResultsUiHandler(BaseHTTPRequestHandler):
             )
         except OllamaError as exc:
             self._send_event("error-message", f"Ollama error: {exc}")
-            return
+            return False
 
         self._send_event("agent-step", {"step": "finalize_result"})
         self._send_event(
@@ -385,6 +492,7 @@ class ResultsUiHandler(BaseHTTPRequestHandler):
                 "reviewer_check": result.reviewer_check,
             },
         )
+        return True
 
     def _send_event(self, event: str, data: object) -> None:
         payload = json.dumps(data)
@@ -407,6 +515,24 @@ def _topic_event(transaction: BankingTransaction, topic: str) -> dict:
         "topic": topic,
         "key": transaction.transaction_id,
         "value": transaction.model_dump(mode="json"),
+    }
+
+
+def _kafka_event_from_message(message, group_id: str) -> dict:
+    """Build a topic event dict from a live Kafka message for the Results UI.
+
+    Includes the consumer group, partition, and offset so the consumer concept
+    is visible in the browser, matching what the terminal consumer reads.
+    """
+
+    key = message.key()
+    return {
+        "topic": message.topic(),
+        "group": group_id,
+        "partition": message.partition(),
+        "offset": message.offset(),
+        "key": key.decode("utf-8") if key is not None else None,
+        "value": json.loads(message.value().decode("utf-8")),
     }
 
 

@@ -29,7 +29,7 @@ Python unit tests:
 Result:
 
 ```text
-15 passed
+16 passed
 ```
 
 Executed test details:
@@ -40,7 +40,7 @@ Executed test details:
 | `tests/test_graph_state.py` | `test_graph_creates_final_result_without_network`, `test_prompt_tells_model_triggered_rules_are_triggered` | LangGraph creates a final inspection result, streams fake Ollama chunks, preserves triggered rule findings, and prompts the model consistently. | None |
 | `tests/test_models.py` | `test_transaction_model_accepts_valid_transaction`, `test_transaction_model_rejects_negative_amount` | Pydantic validates valid banking transactions and rejects invalid negative amounts. | None |
 | `tests/test_rules.py` | `test_normal_transaction_has_no_findings`, `test_large_amount_is_suspicious`, `test_foreign_country_is_suspicious`, `test_large_cash_withdrawal_is_suspicious`, `test_suspicious_merchant_keyword_is_suspicious`, `test_findings_carry_a_severity` | Deterministic rules correctly classify normal transactions, each suspicious rule trigger, and assign a `severity` (`low`/`medium`/`high`) to each finding. | None |
-| `tests/test_results_ui.py` | `test_results_ui_finds_demo_transaction`, `test_results_ui_rejects_unknown_transaction`, `test_results_ui_builds_kafka_topic_event`, `test_results_ui_builds_all_demo_topic_events` | Results UI helper finds predefined demo transactions, rejects unknown ids, and renders demo transactions as Kafka topic events with topic, key, and JSON value without starting the web server. | None |
+| `tests/test_results_ui.py` | `test_results_ui_finds_demo_transaction`, `test_results_ui_rejects_unknown_transaction`, `test_results_ui_builds_kafka_topic_event`, `test_results_ui_builds_all_demo_topic_events`, `test_results_ui_builds_event_from_live_kafka_message` | Results UI helper finds predefined demo transactions, rejects unknown ids, renders demo transactions as Kafka topic events, and maps a live Kafka message (topic, group, partition, offset, key, value) to a UI event without starting the web server or a broker. | None |
 
 The [Tests workflow](../.github/workflows/tests.yml) runs two independent gates:
 
@@ -185,3 +185,4 @@ SUSPICIOUS
 - The consumer script now applies a demo idle timeout through `IDLE_TIMEOUT_SECONDS` and prints a clear producer/replay hint if no messages arrive.
 - The Results UI shows the selected Kafka topic event with topic, key, and JSON value.
 - The Results UI shows the AI agent workflow steps and reuses the same rules, LangGraph workflow, and Ollama client as the terminal consumer.
+- The Results UI "Consume next from Kafka" mode (`GET /api/consume`) reads the next live message with the configured consumer group, shows partition and offset, and commits the offset only after a successful inspection. Demo replay mode keeps working without a broker. The live consume path needs a running broker and produced messages and was not executed in this static verification.
