@@ -162,6 +162,6 @@ SUSPICIOUS
 - Deterministic rules flagged suspicious transactions before the LLM explanation.
 - Ollama streaming worked with the installed qwen 30B model `qwen3-coder:30b` for a smoke test.
 - Ollama streaming also worked for a full 10-message run with the already-installed local model `granite4:350m-h`.
-- The default README model remains `llama3.2`, but it was not present in `ollama list` during this verification run.
+- The default README and code model is `qwen3-coder:30b`, matching the local smoke verification model.
 - The scripts now support `PYTHON=.venv/bin/python` and default to `python3` when `PYTHON` is not set, which is more reliable on macOS systems without a `python` executable.
 - The consumer script now applies a demo idle timeout through `IDLE_TIMEOUT_SECONDS` and prints a clear producer/replay hint if no messages arrive.

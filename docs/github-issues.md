@@ -388,3 +388,24 @@ Acceptance criteria:
 - Commit references this issue.
 
 Traceability: test execution status visibility and verification evidence.
+
+## GH-021: Switch default Ollama model to qwen3-coder 30B
+
+GitHub issue: https://github.com/thomassuedbroecker/simple_kafka_example/issues/21
+
+Labels: `documentation`, `ai`, `developer-experience`
+
+Body:
+
+The consumer currently defaults to `llama3.2`, but the local verification and user environment use `qwen3-coder:30b`. Update the project defaults and docs so the run flow uses `qwen3-coder:30b` by default.
+
+Acceptance criteria:
+
+- `config.py` default `OLLAMA_MODEL` is `qwen3-coder:30b`.
+- `.env.example` uses `qwen3-coder:30b`.
+- README setup and troubleshooting commands use `qwen3-coder:30b`.
+- Verification and traceability docs are updated where they mention the default model.
+- Tests and `docker compose config` pass.
+- Commit references this issue.
+
+Traceability: local Ollama execution and developer experience.

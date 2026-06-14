@@ -14,7 +14,7 @@ class Settings:
     transaction_topic: str = "banking.transactions"
     inspection_topic: str = "banking.transaction.inspections"
     ollama_base_url: str = "http://localhost:11434"
-    ollama_model: str = "llama3.2"
+    ollama_model: str = "qwen3-coder:30b"
     consumer_group_id: str = "banking-ai-inspector"
 
 
@@ -26,7 +26,7 @@ def load_settings() -> Settings:
             "INSPECTION_TOPIC", "banking.transaction.inspections"
         ),
         ollama_base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
-        ollama_model=os.getenv("OLLAMA_MODEL", "llama3.2"),
+        ollama_model=os.getenv("OLLAMA_MODEL", "qwen3-coder:30b"),
         consumer_group_id=os.getenv("CONSUMER_GROUP_ID", "banking-ai-inspector"),
     )
 

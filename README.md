@@ -134,17 +134,17 @@ In one terminal:
 ollama serve
 ```
 
-In another terminal, choose a local model. The default model is `llama3.2`:
+In another terminal, pull the default local model:
 
 ```bash
-ollama pull llama3.2
-export OLLAMA_MODEL=llama3.2
+ollama pull qwen3-coder:30b
+export OLLAMA_MODEL=qwen3-coder:30b
 ```
 
-The local Rancher Desktop verification also worked with this installed qwen 30B model:
+You can still choose another local model by overriding `OLLAMA_MODEL`:
 
 ```bash
-export OLLAMA_MODEL=qwen3-coder:30b
+export OLLAMA_MODEL=llama3.2
 ```
 
 ### 4. Produce Demo Transactions
@@ -327,7 +327,7 @@ Ollama runs the model on your machine. The consumer calls the local Ollama HTTP 
 
 No OpenAI, Anthropic, Gemini, hosted LangSmith, hosted vector database, cloud Kafka, or API key is used.
 
-Ollama models are not bundled with this repository. Check the license for any model you pull locally, such as `llama3.2` or `qwen3-coder:30b`, before redistributing model files or outputs in another project.
+Ollama models are not bundled with this repository. Check the license for any model you pull locally, such as `qwen3-coder:30b` or `llama3.2`, before redistributing model files or outputs in another project.
 
 ## Configuration
 
@@ -338,7 +338,7 @@ KAFKA_BOOTSTRAP_SERVERS=localhost:9092
 TRANSACTION_TOPIC=banking.transactions
 INSPECTION_TOPIC=banking.transaction.inspections
 OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODEL=llama3.2
+OLLAMA_MODEL=qwen3-coder:30b
 CONSUMER_GROUP_ID=banking-ai-inspector
 ```
 
@@ -388,7 +388,7 @@ ollama serve
 Model is missing:
 
 ```bash
-ollama pull llama3.2
+ollama pull qwen3-coder:30b
 ```
 
 Consumer reads no messages:
