@@ -41,6 +41,8 @@ Result:
 | [#16 Add optional Kafbat UI to local Kafka learning setup](https://github.com/thomassuedbroecker/simple_kafka_example/issues/16) | Closed | `docker-compose.yml`, `scripts/start.sh`, `README.md`, `docs/traceability.md`, `THIRD_PARTY_NOTICES.md` | `e54f2b7` |
 | [#17 Refresh repository sync verification evidence](https://github.com/thomassuedbroecker/simple_kafka_example/issues/17) | Closed | `docs/project-status.md`, `docs/verification.md`, `docs/github-issues.md` | `d4b9972` |
 | [#18 Document executed test coverage details](https://github.com/thomassuedbroecker/simple_kafka_example/issues/18) | Closed | `.github/workflows/tests.yml`, `README.md`, `docs/verification.md`, `docs/github-issues.md` | `dcbc468` |
+| [#19 Add README project icon](https://github.com/thomassuedbroecker/simple_kafka_example/issues/19) | Closed as superseded | Request clarified as test execution status badge | No implementation commit |
+| [#20 Add README test execution status badge](https://github.com/thomassuedbroecker/simple_kafka_example/issues/20) | Closed | `README.md`, `.github/workflows/tests.yml`, `docs/github-issues.md`, `docs/project-status.md` | Pending commit |
 
 Issue [#11](https://github.com/thomassuedbroecker/simple_kafka_example/issues/11) is closed as a duplicate of #10.
 

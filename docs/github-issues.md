@@ -346,3 +346,45 @@ Acceptance criteria:
 - Commit references this issue.
 
 Traceability: LI-010 and repository verification evidence.
+
+## GH-019: Add README project icon
+
+GitHub issue: https://github.com/thomassuedbroecker/simple_kafka_example/issues/19
+
+Labels: `documentation`
+
+Body:
+
+Add a visible project icon at the top of the README so the repository has a clearer first impression.
+
+Acceptance criteria:
+
+- Add a repo-local icon asset.
+- Show the icon at the top of `README.md`.
+- Keep the README objective and expected result sections clear.
+- Update local issue/status documentation.
+- Commit references this issue.
+
+Traceability: README usability and learning-project presentation.
+
+Status: closed as superseded by GH-020 after the request was clarified as a test execution status badge.
+
+## GH-020: Add README test execution status badge
+
+GitHub issue: https://github.com/thomassuedbroecker/simple_kafka_example/issues/20
+
+Labels: `documentation`, `testing`
+
+Body:
+
+Add a visible test execution status badge at the top of `README.md` for the Tests workflow.
+
+Acceptance criteria:
+
+- README top shows the GitHub Actions Tests workflow badge.
+- Badge links to `.github/workflows/tests.yml` workflow runs.
+- Documentation clarifies that the workflow has two independent gates: Python unit tests and Docker Compose configuration validation.
+- Local issue/status docs are updated.
+- Commit references this issue.
+
+Traceability: test execution status visibility and verification evidence.
