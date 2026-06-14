@@ -1,10 +1,24 @@
 # Verification Notes
 
-Date: 2026-06-10
+Date: 2026-06-14
 
 Local container runner: Rancher Desktop with Docker context `rancher-desktop`.
 
 ## Verified Commands
+
+Repository sync status:
+
+```bash
+git status -sb
+gh issue list --state open --limit 50 --json number,title,state,url
+```
+
+Result:
+
+```text
+## main...origin/main
+[]
+```
 
 Python unit tests:
 

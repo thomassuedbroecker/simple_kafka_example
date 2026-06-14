@@ -307,3 +307,22 @@ Acceptance criteria:
 - Tests and `docker compose config` pass.
 
 Traceability: LI-001, LI-002, LI-003, LI-008, LI-009, LI-011.
+
+## GH-017: Refresh repository sync verification evidence
+
+GitHub issue: https://github.com/thomassuedbroecker/simple_kafka_example/issues/17
+
+Labels: `documentation`
+
+Body:
+
+Refresh repository status and verification evidence after the Kafbat UI integration.
+
+Acceptance criteria:
+
+- Project status date reflects the latest sync verification.
+- Verification notes date reflects the latest local checks.
+- Verification notes include the current checks: open issue list, `docker compose config`, `pytest`, and `git status`.
+- Commit references this issue.
+
+Traceability: documentation/code synchronization.
