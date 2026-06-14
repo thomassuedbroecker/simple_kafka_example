@@ -74,11 +74,15 @@ flowchart LR
     F --> I[Results UI: topic event and AI agent result]
 ```
 
-## Demo GIF
+## Demo GIFs
 
 The GIF below shows the local browser UI for inspecting Kafka learning data:
 
 ![Kafbat UI and local inspection flow](images/kafbat-ui-1ß.gif)
+
+The GIF below show how to inspect transactions with an AI agent.
+
+![Example inspection of the transactions](images/inspect-transactions.gif)
 
 ## Run The Example
 
