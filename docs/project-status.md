@@ -40,7 +40,7 @@ Result:
 | [#15 Reorder README around objective and expected results](https://github.com/thomassuedbroecker/simple_kafka_example/issues/15) | Closed | `README.md`, `docs/github-issues.md` | `6bc4b9c` |
 | [#16 Add optional Kafbat UI to local Kafka learning setup](https://github.com/thomassuedbroecker/simple_kafka_example/issues/16) | Closed | `docker-compose.yml`, `scripts/start.sh`, `README.md`, `docs/traceability.md`, `THIRD_PARTY_NOTICES.md` | `e54f2b7` |
 | [#17 Refresh repository sync verification evidence](https://github.com/thomassuedbroecker/simple_kafka_example/issues/17) | Closed | `docs/project-status.md`, `docs/verification.md`, `docs/github-issues.md` | `d4b9972` |
-| [#18 Document executed test coverage details](https://github.com/thomassuedbroecker/simple_kafka_example/issues/18) | Closed | `.github/workflows/tests.yml`, `README.md`, `docs/verification.md`, `docs/github-issues.md` | Pending commit |
+| [#18 Document executed test coverage details](https://github.com/thomassuedbroecker/simple_kafka_example/issues/18) | Closed | `.github/workflows/tests.yml`, `README.md`, `docs/verification.md`, `docs/github-issues.md` | `dcbc468` |
 
 Issue [#11](https://github.com/thomassuedbroecker/simple_kafka_example/issues/11) is closed as a duplicate of #10.
 
